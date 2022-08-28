@@ -26,7 +26,7 @@ namespace YandexCellInfoWF.Models
         [JsonIgnore]
         public int EnbNumber { get; set; }
 
-        public CellInfo(int mcc, int mnc, int lac, int cellId, int signalStrength = -100, int ageInfo = 1000)
+        public CellInfo(int mcc, int mnc, int lac, int cellId, int signalStrength = -45, int ageInfo = 1000)
         {
             MCC = mcc;
             MNC = mnc;
@@ -38,7 +38,7 @@ namespace YandexCellInfoWF.Models
             EnbNumber = CellId / 256;
         }
 
-        public CellInfo(int mcc, int mnc, int lac, int enbNumber, int sector, int signalStrength = -100, int ageInfo = 1000)
+        public CellInfo(int mcc, int mnc, int lac, int enbNumber, int sector, int signalStrength = -45, int ageInfo = 1000)
         {
             MCC = mcc;
             MNC = mnc;

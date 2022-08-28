@@ -67,13 +67,23 @@ namespace YandexCellInfoWF
                 }
             }
             else if (detaliedSearchRadioButton.Checked)
-                return;
+                if (StartButton.Text == "Остановить сканирование")
+                {
+                    Workers.DetailedInfoWorker.CancelTask();
+                    StartButton.Text = "Начать сканирование";
+                }
+                else
+                {
+                    StartButton.Text = "Остановить сканирование";
+                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, false);
+                    ResetInterface();
+                }
 
         }
 
         private void allSearchRadioButton_CheckedChanged(object sender, System.EventArgs e)
         {
-            saveManyFilesCheckBox.Enabled = !saveManyFilesCheckBox.Enabled;
+            //saveManyFilesCheckBox.Enabled = !saveManyFilesCheckBox.Enabled;
             StartButton.Enabled = true;
         }
 

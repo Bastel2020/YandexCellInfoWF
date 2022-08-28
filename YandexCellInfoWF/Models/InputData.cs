@@ -21,5 +21,12 @@ namespace YandexCellInfoWF.Models
             LacsString = lacsString;
             SectorsString = sectorsString;
         }
+        public InputData(string mccString, string mncString, string enbsString, string lacsString)
+        {
+            MccString = mccString;
+            MncString = mncString;
+            EnbsString = enbsString;
+            LacsString = lacsString;
+        }
     }
 }

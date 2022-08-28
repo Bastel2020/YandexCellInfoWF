@@ -29,7 +29,7 @@ namespace YandexCellInfoWF.Workers
 
             var parsedData = new OutputData();
             var commonInfo = new YandexRequestCommonInfo(apiKey);
-            var results = new List<EnbShortInfo>();
+            var results = new List<BaseItemInfo>();
 
             if (!InputParser.ParseInputWithSector(new InputData(mccString, mncString, enbsString, lacsString, sectorsString), out parsedData))
             {
@@ -42,7 +42,9 @@ namespace YandexCellInfoWF.Workers
             //foreach (var enb in parsedData.Enbs)
             for (var i = 0; i < parsedData.Enbs.Count; i++)
             {
-                //counter++;
+                currentEnb.Text = parsedData.Enbs[i].ToString();
+                progressBar.Value = (int)Math.Round((100d / parsedData.Enbs.Count) * i);
+
                 var cells = new List<CellInfo>();
                 foreach (var lac in parsedData.Lacs)
                 {
@@ -65,7 +67,7 @@ namespace YandexCellInfoWF.Workers
                     }, ctSource.Token);
                     if (parsedResponse.LocationType.ToLower() == "gsm")
                     {
-                        results.Add(new EnbShortInfo(parsedData.Enbs[i], parsedResponse));
+                        results.Add(new BaseItemInfo(parsedData.Enbs[i], parsedResponse));
                         console.AppendText($"\r\n[{DateTime.Now:T}] Найдено! Enb: {parsedData.Enbs[i]}." +
                             $"\r\nGPS: {parsedResponse.Latitude:0.00000}, {parsedResponse.Longitude:0.00000}");
                         console.ScrollToCaret();
@@ -73,8 +75,8 @@ namespace YandexCellInfoWF.Workers
                 }
                 catch (OperationCanceledException)
                 {
-                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.Hour}.{DateTime.Now.Minute} {mccString}-{mncString}" + "EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
-                    //System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.Hour}.{DateTime.Now.Minute} {mccString}-{mncString}" + "EnbNums.txt", JsonConvert.SerializeObject(successEnbsNums, Formatting.Indented));
+                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
+                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
                     console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот принудительно остановлен. Все найденные соты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
                     return true;
@@ -91,17 +93,20 @@ namespace YandexCellInfoWF.Workers
                         break;
                     }
                 }
+                catch (Newtonsoft.Json.JsonReaderException e)
+                {
+                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка обработки JSON. Возможно, что запрос слишком велик. Уменьшите число LAC и секторов. Повтор через 3 сек.");
+                    Thread.Sleep(3000);
+                }
                 catch (Exception e)
                 {
                     console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message}. Завершение работы программы.");
                     break;
                 }
-                progressBar.Value = (int)((100d / parsedData.Enbs.Count) * i);
-                currentEnb.Text = parsedData.Enbs[i].ToString();
 
             }
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
-            //System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.Hour}.{DateTime.Now.Minute} {mccString}-{mncString}" + "EnbNums.txt", JsonConvert.SerializeObject(successEnbsNums, Formatting.Indented));
+            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
             console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Все найденные соты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
 

@@ -38,6 +38,8 @@ namespace YandexCellInfoWF
             this.label2 = new System.Windows.Forms.Label();
             this.allSearrchDescrLabel = new System.Windows.Forms.Label();
             this.saveManyFilesCheckBox = new System.Windows.Forms.CheckBox();
+            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
+            this.StartButton = new System.Windows.Forms.Button();
             this.sectorsTextBox = new System.Windows.Forms.TextBox();
             this.sectorsLabel = new System.Windows.Forms.Label();
             this.ConsoleGroupBox = new System.Windows.Forms.GroupBox();
@@ -53,9 +55,7 @@ namespace YandexCellInfoWF
             this.LacLabel = new System.Windows.Forms.Label();
             this.MccLabel = new System.Windows.Forms.Label();
             this.statusStrip1 = new System.Windows.Forms.StatusStrip();
-            this.StartButton = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
-            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
             this.progressLabel = new System.Windows.Forms.Label();
             this.currentEnbTextLabel = new System.Windows.Forms.Label();
             this.currentEnbLabel = new System.Windows.Forms.Label();
@@ -86,7 +86,7 @@ namespace YandexCellInfoWF
             // GetTokenLinkLabel
             // 
             this.GetTokenLinkLabel.AutoSize = true;
-            this.GetTokenLinkLabel.Location = new System.Drawing.Point(464, 12);
+            this.GetTokenLinkLabel.Location = new System.Drawing.Point(459, 13);
             this.GetTokenLinkLabel.Name = "GetTokenLinkLabel";
             this.GetTokenLinkLabel.Size = new System.Drawing.Size(54, 13);
             this.GetTokenLinkLabel.TabIndex = 22;
@@ -110,7 +110,7 @@ namespace YandexCellInfoWF
             // detaliedSearchRadioButton
             // 
             this.detaliedSearchRadioButton.AutoSize = true;
-            this.detaliedSearchRadioButton.Location = new System.Drawing.Point(248, 17);
+            this.detaliedSearchRadioButton.Location = new System.Drawing.Point(262, 17);
             this.detaliedSearchRadioButton.Name = "detaliedSearchRadioButton";
             this.detaliedSearchRadioButton.Size = new System.Drawing.Size(174, 17);
             this.detaliedSearchRadioButton.TabIndex = 7;
@@ -124,7 +124,6 @@ namespace YandexCellInfoWF
             this.searchModeGroupBox.Controls.Add(this.label2);
             this.searchModeGroupBox.Controls.Add(this.allSearrchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.saveManyFilesCheckBox);
-            this.searchModeGroupBox.Controls.Add(this.sendDataCheckBox);
             this.searchModeGroupBox.Controls.Add(this.StartButton);
             this.searchModeGroupBox.Controls.Add(this.sectorsTextBox);
             this.searchModeGroupBox.Controls.Add(this.detaliedSearchRadioButton);
@@ -141,12 +140,12 @@ namespace YandexCellInfoWF
             // label2
             // 
             this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(248, 50);
+            this.label2.Location = new System.Drawing.Point(259, 50);
             this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(260, 65);
+            this.label2.Size = new System.Drawing.Size(239, 65);
             this.label2.TabIndex = 26;
-            this.label2.Text = "Подробная информация о БС: все существующие\r\nна ней сектора информация о них:\r\nНо" +
-    "мер, LAC, местоположение сектора.\r\n\r\nРезультат: список БС c секторами и LAC.";
+            this.label2.Text = "Подробная информация о БС: существующие\r\nна ней сектора и информация о них: номер" +
+    ",\r\nLAC, местоположение сектора.\r\n\r\nРезультат: список БС c секторами и LAC.";
             // 
             // allSearrchDescrLabel
             // 
@@ -161,12 +160,38 @@ namespace YandexCellInfoWF
             // saveManyFilesCheckBox
             // 
             this.saveManyFilesCheckBox.AutoSize = true;
-            this.saveManyFilesCheckBox.Location = new System.Drawing.Point(251, 152);
+            this.saveManyFilesCheckBox.Enabled = false;
+            this.saveManyFilesCheckBox.Location = new System.Drawing.Point(262, 131);
             this.saveManyFilesCheckBox.Name = "saveManyFilesCheckBox";
-            this.saveManyFilesCheckBox.Size = new System.Drawing.Size(245, 17);
+            this.saveManyFilesCheckBox.Size = new System.Drawing.Size(231, 17);
             this.saveManyFilesCheckBox.TabIndex = 9;
-            this.saveManyFilesCheckBox.Text = "Сохранять отдельный файл для каждой БС";
+            this.saveManyFilesCheckBox.Text = "Определять LAC сектора (в разработке)";
             this.saveManyFilesCheckBox.UseVisualStyleBackColor = true;
+            // 
+            // sendDataCheckBox
+            // 
+            this.sendDataCheckBox.AutoSize = true;
+            this.sendDataCheckBox.Checked = true;
+            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sendDataCheckBox.Location = new System.Drawing.Point(125, 362);
+            this.sendDataCheckBox.Name = "sendDataCheckBox";
+            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
+            this.sendDataCheckBox.TabIndex = 24;
+            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
+    "БС)\r\n";
+            this.sendDataCheckBox.UseVisualStyleBackColor = true;
+            this.sendDataCheckBox.Visible = false;
+            // 
+            // StartButton
+            // 
+            this.StartButton.Enabled = false;
+            this.StartButton.Location = new System.Drawing.Point(385, 189);
+            this.StartButton.Name = "StartButton";
+            this.StartButton.Size = new System.Drawing.Size(116, 53);
+            this.StartButton.TabIndex = 10;
+            this.StartButton.Text = "Начать сканирование";
+            this.StartButton.UseVisualStyleBackColor = true;
+            this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
             // 
             // sectorsTextBox
             // 
@@ -319,17 +344,6 @@ namespace YandexCellInfoWF
             this.statusStrip1.TabIndex = 8;
             this.statusStrip1.Text = "statusStrip1";
             // 
-            // StartButton
-            // 
-            this.StartButton.Enabled = false;
-            this.StartButton.Location = new System.Drawing.Point(386, 193);
-            this.StartButton.Name = "StartButton";
-            this.StartButton.Size = new System.Drawing.Size(116, 53);
-            this.StartButton.TabIndex = 10;
-            this.StartButton.Text = "Начать сканирование";
-            this.StartButton.UseVisualStyleBackColor = true;
-            this.StartButton.Click += new System.EventHandler(this.StartButton_Click);
-            // 
             // progressBar1
             // 
             this.progressBar1.Location = new System.Drawing.Point(541, 378);
@@ -337,20 +351,6 @@ namespace YandexCellInfoWF
             this.progressBar1.Size = new System.Drawing.Size(176, 15);
             this.progressBar1.TabIndex = 19;
             this.progressBar1.Click += new System.EventHandler(this.progressBar1_Click);
-            // 
-            // sendDataCheckBox
-            // 
-            this.sendDataCheckBox.AutoSize = true;
-            this.sendDataCheckBox.Checked = true;
-            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.sendDataCheckBox.Location = new System.Drawing.Point(251, 175);
-            this.sendDataCheckBox.Name = "sendDataCheckBox";
-            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
-            this.sendDataCheckBox.TabIndex = 24;
-            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
-    "БС)\r\n";
-            this.sendDataCheckBox.UseVisualStyleBackColor = true;
-            this.sendDataCheckBox.Visible = false;
             // 
             // progressLabel
             // 
@@ -391,6 +391,7 @@ namespace YandexCellInfoWF
             this.Controls.Add(this.currentEnbLabel);
             this.Controls.Add(this.currentEnbTextLabel);
             this.Controls.Add(this.progressLabel);
+            this.Controls.Add(this.sendDataCheckBox);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.generalSettingsGroupBox);
@@ -402,7 +403,7 @@ namespace YandexCellInfoWF
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "YandexCellInfo by Bastel2020";
+            this.Text = "YandexCellInfo by Bastel2020 (v1.0)";
             this.searchModeGroupBox.ResumeLayout(false);
             this.searchModeGroupBox.PerformLayout();
             this.ConsoleGroupBox.ResumeLayout(false);
