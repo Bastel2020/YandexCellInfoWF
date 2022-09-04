@@ -93,6 +93,8 @@
     <Compile Include="Models\InputData.cs" />
     <Compile Include="Models\LocationInfo.cs" />
     <Compile Include="Models\OutputData.cs" />
+    <Compile Include="Models\Settings\DefaultFields.cs" />
+    <Compile Include="Models\Settings\PreloadSectors.cs" />
     <Compile Include="Models\YandexRequest.cs" />
     <Compile Include="Models\YandexRequestCommonInfo.cs" />
     <Compile Include="Models\YandexResponse.cs" />

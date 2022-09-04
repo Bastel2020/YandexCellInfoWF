@@ -75,7 +75,7 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, false);
+                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked);
                     ResetInterface();
                 }
 
@@ -83,13 +83,16 @@ namespace YandexCellInfoWF
 
         private void allSearchRadioButton_CheckedChanged(object sender, System.EventArgs e)
         {
-            //saveManyFilesCheckBox.Enabled = !saveManyFilesCheckBox.Enabled;
+            detectLacCheckBox.Enabled = !detectLacCheckBox.Enabled;
+            detailedSearchDescrLabel.Enabled = !detailedSearchDescrLabel.Enabled;
             StartButton.Enabled = true;
         }
 
         private void detaliedSearchRadioButton_CheckedChanged(object sender, System.EventArgs e)
         {
             sectorsTextBox.Enabled = !sectorsTextBox.Enabled;
+            sectorsLabel.Enabled = !sectorsLabel.Enabled;
+            allSearrchDescrLabel.Enabled = !allSearrchDescrLabel.Enabled;
             StartButton.Enabled = true;
         }
 
@@ -110,14 +113,20 @@ namespace YandexCellInfoWF
 
         public void ChangeTextStatus()
         {
+            progressBar1.Value = 0;
+            TokenTextBox.Enabled = !TokenTextBox.Enabled;
             MccTextBox.Enabled = !MccTextBox.Enabled;
             MncTextBox.Enabled = !MncTextBox.Enabled;
             LacTextBox.Enabled = !LacTextBox.Enabled;
             enbsTextBox.Enabled = !enbsTextBox.Enabled;
-            sectorsTextBox.Enabled = !sectorsTextBox.Enabled;
             allSearchRadioButton.Enabled = !allSearchRadioButton.Enabled;
             detaliedSearchRadioButton.Enabled = !detaliedSearchRadioButton.Enabled;
             sendDataCheckBox.Enabled = !sendDataCheckBox.Enabled;
+
+            if (detaliedSearchRadioButton.Checked)
+                detectLacCheckBox.Enabled = !detectLacCheckBox.Enabled;
+            else if (allSearchRadioButton.Checked)
+                sectorsTextBox.Enabled = !sectorsTextBox.Enabled;
         }
 
         public void ResetInterface()
@@ -126,12 +135,20 @@ namespace YandexCellInfoWF
             MncTextBox.Enabled = true;
             LacTextBox.Enabled = true;
             enbsTextBox.Enabled = true;
-            sectorsTextBox.Enabled = true;
             allSearchRadioButton.Enabled = true;
             detaliedSearchRadioButton.Enabled = true;
             sendDataCheckBox.Enabled = true;
+            TokenTextBox.Enabled = true;
             StartButton.Text = "Начать сканирование";
-            progressBar1.Value = 0;
+            if (detaliedSearchRadioButton.Checked)
+                detectLacCheckBox.Enabled = detectLacCheckBox.Enabled;
+            else if (allSearchRadioButton.Checked)
+                sectorsTextBox.Enabled = sectorsTextBox.Enabled;
+        }
+
+        private void saveManyFilesCheckBox_CheckedChanged(object sender, System.EventArgs e)
+        {
+
         }
     }
 }

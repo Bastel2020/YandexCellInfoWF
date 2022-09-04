@@ -37,9 +37,6 @@ namespace YandexCellInfoWF.Workers
                 return false;
             }
 
-            //var counter = 0;
-
-            //foreach (var enb in parsedData.Enbs)
             for (var i = 0; i < parsedData.Enbs.Count; i++)
             {
                 currentEnb.Text = parsedData.Enbs[i].ToString();
@@ -109,19 +106,6 @@ namespace YandexCellInfoWF.Workers
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
             console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Все найденные соты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
-
-
-            //for (var cellId = minEnb; cellId <= maxEnb; cellId++)
-            //{
-            //    var GSMList = new List<CellInfo>();
-            //    for (int i = 0; i < lacs.Count; i++)
-            //    {
-            //        for (int sectorIndex = 0; sectorIndex < sectors.Count; sectorIndex++)
-            //        {
-            //            GSMList.Add(new GSMCell() { countrycode = mcc, operatorid = mnc, cellid = cellId * 256 + sectors[sectorIndex], age = 1000, lac = lacs[i], signal_strength = -180 + sectorIndex });
-            //        }
-            //    }
-            //    AllGSMList.Add(GSMList);
             return true;
         }
 

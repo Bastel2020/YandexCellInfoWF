@@ -35,13 +35,13 @@ namespace YandexCellInfoWF
             this.allSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.detaliedSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.searchModeGroupBox = new System.Windows.Forms.GroupBox();
-            this.label2 = new System.Windows.Forms.Label();
+            this.detailedSearchDescrLabel = new System.Windows.Forms.Label();
             this.allSearrchDescrLabel = new System.Windows.Forms.Label();
-            this.saveManyFilesCheckBox = new System.Windows.Forms.CheckBox();
-            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
+            this.detectLacCheckBox = new System.Windows.Forms.CheckBox();
             this.StartButton = new System.Windows.Forms.Button();
             this.sectorsTextBox = new System.Windows.Forms.TextBox();
             this.sectorsLabel = new System.Windows.Forms.Label();
+            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
             this.ConsoleGroupBox = new System.Windows.Forms.GroupBox();
             this.ConsoleTextBox = new System.Windows.Forms.TextBox();
             this.generalSettingsGroupBox = new System.Windows.Forms.GroupBox();
@@ -98,7 +98,7 @@ namespace YandexCellInfoWF
             // allSearchRadioButton
             // 
             this.allSearchRadioButton.AutoSize = true;
-            this.allSearchRadioButton.Location = new System.Drawing.Point(6, 17);
+            this.allSearchRadioButton.Location = new System.Drawing.Point(10, 17);
             this.allSearchRadioButton.Name = "allSearchRadioButton";
             this.allSearchRadioButton.Size = new System.Drawing.Size(236, 17);
             this.allSearchRadioButton.TabIndex = 6;
@@ -121,9 +121,9 @@ namespace YandexCellInfoWF
             // 
             // searchModeGroupBox
             // 
-            this.searchModeGroupBox.Controls.Add(this.label2);
+            this.searchModeGroupBox.Controls.Add(this.detailedSearchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.allSearrchDescrLabel);
-            this.searchModeGroupBox.Controls.Add(this.saveManyFilesCheckBox);
+            this.searchModeGroupBox.Controls.Add(this.detectLacCheckBox);
             this.searchModeGroupBox.Controls.Add(this.StartButton);
             this.searchModeGroupBox.Controls.Add(this.sectorsTextBox);
             this.searchModeGroupBox.Controls.Add(this.detaliedSearchRadioButton);
@@ -137,50 +137,36 @@ namespace YandexCellInfoWF
             this.searchModeGroupBox.Text = "3. Режим поиска и подробные настройки";
             this.searchModeGroupBox.Enter += new System.EventHandler(this.groupBox1_Enter);
             // 
-            // label2
+            // detailedSearchDescrLabel
             // 
-            this.label2.AutoSize = true;
-            this.label2.Location = new System.Drawing.Point(259, 50);
-            this.label2.Name = "label2";
-            this.label2.Size = new System.Drawing.Size(239, 65);
-            this.label2.TabIndex = 26;
-            this.label2.Text = "Подробная информация о БС: существующие\r\nна ней сектора и информация о них: номер" +
+            this.detailedSearchDescrLabel.AutoSize = true;
+            this.detailedSearchDescrLabel.Location = new System.Drawing.Point(259, 50);
+            this.detailedSearchDescrLabel.Name = "detailedSearchDescrLabel";
+            this.detailedSearchDescrLabel.Size = new System.Drawing.Size(239, 65);
+            this.detailedSearchDescrLabel.TabIndex = 26;
+            this.detailedSearchDescrLabel.Text = "Подробная информация о БС: существующие\r\nна ней сектора и информация о них: номер" +
     ",\r\nLAC, местоположение сектора.\r\n\r\nРезультат: список БС c секторами и LAC.";
             // 
             // allSearrchDescrLabel
             // 
             this.allSearrchDescrLabel.AutoSize = true;
-            this.allSearrchDescrLabel.Location = new System.Drawing.Point(6, 50);
+            this.allSearrchDescrLabel.Location = new System.Drawing.Point(7, 50);
             this.allSearrchDescrLabel.Name = "allSearrchDescrLabel";
             this.allSearrchDescrLabel.Size = new System.Drawing.Size(198, 78);
             this.allSearrchDescrLabel.TabIndex = 25;
             this.allSearrchDescrLabel.Text = "Поиск всех БС среди указанных Enb,\r\nкоторые соответствуют требованиям\r\nпо LAC и н" +
     "омерам секторов.\r\n\r\nРезультат: номера БС, отвечающие\r\nтребованиям поиска.";
             // 
-            // saveManyFilesCheckBox
+            // detectLacCheckBox
             // 
-            this.saveManyFilesCheckBox.AutoSize = true;
-            this.saveManyFilesCheckBox.Enabled = false;
-            this.saveManyFilesCheckBox.Location = new System.Drawing.Point(262, 131);
-            this.saveManyFilesCheckBox.Name = "saveManyFilesCheckBox";
-            this.saveManyFilesCheckBox.Size = new System.Drawing.Size(231, 17);
-            this.saveManyFilesCheckBox.TabIndex = 9;
-            this.saveManyFilesCheckBox.Text = "Определять LAC сектора (в разработке)";
-            this.saveManyFilesCheckBox.UseVisualStyleBackColor = true;
-            // 
-            // sendDataCheckBox
-            // 
-            this.sendDataCheckBox.AutoSize = true;
-            this.sendDataCheckBox.Checked = true;
-            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.sendDataCheckBox.Location = new System.Drawing.Point(125, 362);
-            this.sendDataCheckBox.Name = "sendDataCheckBox";
-            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
-            this.sendDataCheckBox.TabIndex = 24;
-            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
-    "БС)\r\n";
-            this.sendDataCheckBox.UseVisualStyleBackColor = true;
-            this.sendDataCheckBox.Visible = false;
+            this.detectLacCheckBox.AutoSize = true;
+            this.detectLacCheckBox.Location = new System.Drawing.Point(262, 131);
+            this.detectLacCheckBox.Name = "detectLacCheckBox";
+            this.detectLacCheckBox.Size = new System.Drawing.Size(239, 17);
+            this.detectLacCheckBox.TabIndex = 9;
+            this.detectLacCheckBox.Text = "Определять LAC сектора (ниже скорость)";
+            this.detectLacCheckBox.UseVisualStyleBackColor = true;
+            this.detectLacCheckBox.CheckedChanged += new System.EventHandler(this.saveManyFilesCheckBox_CheckedChanged);
             // 
             // StartButton
             // 
@@ -196,7 +182,7 @@ namespace YandexCellInfoWF
             // sectorsTextBox
             // 
             this.sectorsTextBox.AllowDrop = true;
-            this.sectorsTextBox.Location = new System.Drawing.Point(58, 150);
+            this.sectorsTextBox.Location = new System.Drawing.Point(69, 150);
             this.sectorsTextBox.Multiline = true;
             this.sectorsTextBox.Name = "sectorsTextBox";
             this.sectorsTextBox.Size = new System.Drawing.Size(146, 92);
@@ -206,30 +192,44 @@ namespace YandexCellInfoWF
             // sectorsLabel
             // 
             this.sectorsLabel.AutoSize = true;
-            this.sectorsLabel.Location = new System.Drawing.Point(7, 150);
+            this.sectorsLabel.Location = new System.Drawing.Point(9, 150);
             this.sectorsLabel.Name = "sectorsLabel";
             this.sectorsLabel.Size = new System.Drawing.Size(52, 13);
             this.sectorsLabel.TabIndex = 0;
             this.sectorsLabel.Text = "Сектора:";
             // 
+            // sendDataCheckBox
+            // 
+            this.sendDataCheckBox.AutoSize = true;
+            this.sendDataCheckBox.Checked = true;
+            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sendDataCheckBox.Location = new System.Drawing.Point(125, 362);
+            this.sendDataCheckBox.Name = "sendDataCheckBox";
+            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
+            this.sendDataCheckBox.TabIndex = 24;
+            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
+    "БС)\r\n";
+            this.sendDataCheckBox.UseVisualStyleBackColor = true;
+            this.sendDataCheckBox.Visible = false;
+            // 
             // ConsoleGroupBox
             // 
             this.ConsoleGroupBox.Controls.Add(this.ConsoleTextBox);
-            this.ConsoleGroupBox.Location = new System.Drawing.Point(516, 10);
+            this.ConsoleGroupBox.Location = new System.Drawing.Point(516, 2);
             this.ConsoleGroupBox.Name = "ConsoleGroupBox";
-            this.ConsoleGroupBox.Size = new System.Drawing.Size(203, 357);
+            this.ConsoleGroupBox.Size = new System.Drawing.Size(203, 375);
             this.ConsoleGroupBox.TabIndex = 20;
             this.ConsoleGroupBox.TabStop = false;
             this.ConsoleGroupBox.Text = "Вывод";
             // 
             // ConsoleTextBox
             // 
-            this.ConsoleTextBox.Location = new System.Drawing.Point(4, 17);
+            this.ConsoleTextBox.Location = new System.Drawing.Point(4, 14);
             this.ConsoleTextBox.Multiline = true;
             this.ConsoleTextBox.Name = "ConsoleTextBox";
             this.ConsoleTextBox.ReadOnly = true;
             this.ConsoleTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.ConsoleTextBox.Size = new System.Drawing.Size(197, 334);
+            this.ConsoleTextBox.Size = new System.Drawing.Size(197, 355);
             this.ConsoleTextBox.TabIndex = 21;
             this.ConsoleTextBox.TextChanged += new System.EventHandler(this.ConsoleTextBox_TextChanged);
             // 
@@ -439,9 +439,9 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.Label sectorsLabel;
         private System.Windows.Forms.TextBox enbsTextBox;
         private System.Windows.Forms.Label enbsLabel;
-        private System.Windows.Forms.CheckBox saveManyFilesCheckBox;
+        private System.Windows.Forms.CheckBox detectLacCheckBox;
         private System.Windows.Forms.LinkLabel EnbDescrLinkLabel;
-        private System.Windows.Forms.Label label2;
+        private System.Windows.Forms.Label detailedSearchDescrLabel;
         private System.Windows.Forms.Label allSearrchDescrLabel;
         private System.Windows.Forms.CheckBox sendDataCheckBox;
         private System.Windows.Forms.Label progressLabel;
