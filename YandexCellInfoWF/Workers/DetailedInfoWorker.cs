@@ -73,7 +73,7 @@ namespace YandexCellInfoWF.Workers
                             allCommonCells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
                         }
                     var checkAllCommonSectorsResult = await MakeRequest(console, commonInfo, allCommonCells);
-                    if (!(checkAllCommonSectorsResult.Equals(new BaseItemInfo())))
+                    if (!checkAllCommonSectorsResult.Equals(new BaseItemInfo()))
                     {
                         foreach (var sector in commonSectors)
                         {
@@ -82,12 +82,13 @@ namespace YandexCellInfoWF.Workers
                             foreach (var lac in parsedData.Lacs)
                                 cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
 
-                            var requestResult = await MakeRequest(console, commonInfo, cells, sector);
+                            //var requestResult = await MakeRequest(console, commonInfo, cells, sector);
+                            var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, sector);
 
                             if (requestResult == null)
                                 return results;
 
-                            else if (!(requestResult.Equals(new BaseItemInfo())))
+                            else if (!requestResult.Equals(new BaseItemInfo()))
                             {
                                 if (checkLac)
                                 {
@@ -177,12 +178,12 @@ namespace YandexCellInfoWF.Workers
             }
             catch (Exception e)
             {
-                if (repeated)
+                c if (repeated)
                 {
-                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message}. Пропуск сектора.");
+                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
                     return result;
                 }
-                console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message}. Повтор.");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
                 return await MakeRequest(console, commonInfo, cells, sectorNum, true);
             }
         }

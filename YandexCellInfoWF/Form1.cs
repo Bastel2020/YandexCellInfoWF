@@ -11,6 +11,8 @@ namespace YandexCellInfoWF
         public Form1()
         {
             InitializeComponent();
+
+            Service.SettingsLoaderService.ChangeInterface(TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
         }
 
         private void label1_Click(object sender, System.EventArgs e)
@@ -141,9 +143,11 @@ namespace YandexCellInfoWF
             TokenTextBox.Enabled = true;
             StartButton.Text = "Начать сканирование";
             if (detaliedSearchRadioButton.Checked)
-                detectLacCheckBox.Enabled = detectLacCheckBox.Enabled;
+                detectLacCheckBox.Enabled = true;
             else if (allSearchRadioButton.Checked)
-                sectorsTextBox.Enabled = sectorsTextBox.Enabled;
+                sectorsTextBox.Enabled = true;
+
+            progressBar1.Value = 0;
         }
 
         private void saveManyFilesCheckBox_CheckedChanged(object sender, System.EventArgs e)

@@ -403,7 +403,7 @@ namespace YandexCellInfoWF
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "YandexCellInfo by Bastel2020 (v1.0)";
+            this.Text = "YandexCellInfo by Bastel2020 (v1.1)";
             this.searchModeGroupBox.ResumeLayout(false);
             this.searchModeGroupBox.PerformLayout();
             this.ConsoleGroupBox.ResumeLayout(false);

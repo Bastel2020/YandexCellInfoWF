@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace YandexCellInfoWF.Models.Settings
 {
-    public class PreloadSectors
+    public class SettingsBase
     {
-        public int MCC;
-        public int MNC;
-        public int[] Sectors;
+        public DefaultFields DefaultFields;
+        public PreloadSectors[] PreloadSectors;
     }
 }

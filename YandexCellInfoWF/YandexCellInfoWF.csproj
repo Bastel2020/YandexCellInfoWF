@@ -58,7 +58,7 @@
     <GenerateManifests>true</GenerateManifests>
   </PropertyGroup>
   <PropertyGroup>
-    <SignManifests>true</SignManifests>
+    <SignManifests>false</SignManifests>
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
@@ -95,11 +95,15 @@
     <Compile Include="Models\OutputData.cs" />
     <Compile Include="Models\Settings\DefaultFields.cs" />
     <Compile Include="Models\Settings\PreloadSectors.cs" />
+    <Compile Include="Models\Settings\SettingsBase.cs" />
     <Compile Include="Models\YandexRequest.cs" />
     <Compile Include="Models\YandexRequestCommonInfo.cs" />
     <Compile Include="Models\YandexResponse.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
+    <Compile Include="Services\GzipService.cs" />
+    <Compile Include="Services\RequestService.cs" />
+    <Compile Include="Services\SettingsLoaderService.cs" />
     <Compile Include="Workers\DetailedInfoWorker.cs" />
     <Compile Include="Workers\ManyInfoWorker.cs" />
     <Compile Include="Workers\InputParser.cs" />
