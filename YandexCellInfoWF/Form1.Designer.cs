@@ -59,6 +59,7 @@ namespace YandexCellInfoWF
             this.progressLabel = new System.Windows.Forms.Label();
             this.currentEnbTextLabel = new System.Windows.Forms.Label();
             this.currentEnbLabel = new System.Windows.Forms.Label();
+            this.dontSaveFileCheckBox = new System.Windows.Forms.CheckBox();
             this.searchModeGroupBox.SuspendLayout();
             this.ConsoleGroupBox.SuspendLayout();
             this.generalSettingsGroupBox.SuspendLayout();
@@ -121,6 +122,7 @@ namespace YandexCellInfoWF
             // 
             // searchModeGroupBox
             // 
+            this.searchModeGroupBox.Controls.Add(this.dontSaveFileCheckBox);
             this.searchModeGroupBox.Controls.Add(this.detailedSearchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.allSearrchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.detectLacCheckBox);
@@ -383,6 +385,16 @@ namespace YandexCellInfoWF
             this.currentEnbLabel.TabIndex = 17;
             this.currentEnbLabel.Text = "0";
             // 
+            // dontSaveFileCheckBox
+            // 
+            this.dontSaveFileCheckBox.AutoSize = true;
+            this.dontSaveFileCheckBox.Location = new System.Drawing.Point(247, 220);
+            this.dontSaveFileCheckBox.Name = "dontSaveFileCheckBox";
+            this.dontSaveFileCheckBox.Size = new System.Drawing.Size(132, 17);
+            this.dontSaveFileCheckBox.TabIndex = 27;
+            this.dontSaveFileCheckBox.Text = "Не сохранять файлы";
+            this.dontSaveFileCheckBox.UseVisualStyleBackColor = true;
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
@@ -447,6 +459,7 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.Label progressLabel;
         private System.Windows.Forms.Label currentEnbTextLabel;
         private System.Windows.Forms.Label currentEnbLabel;
+        private System.Windows.Forms.CheckBox dontSaveFileCheckBox;
     }
 }
 

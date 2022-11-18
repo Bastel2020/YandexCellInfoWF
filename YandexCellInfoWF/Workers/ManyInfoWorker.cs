@@ -20,7 +20,7 @@ namespace YandexCellInfoWF.Workers
 
         private static HttpClient client = new HttpClient();
 
-        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, string sectorsString)
+        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, string sectorsString, bool dontSaveFiles)
         {
             ctSource = new CancellationTokenSource();
             ct = ctSource.Token;
@@ -72,11 +72,8 @@ namespace YandexCellInfoWF.Workers
                 }
                 catch (OperationCanceledException)
                 {
-                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
-                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
-                    console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот принудительно остановлен. Все найденные соты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
-
-                    return true;
+                    console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот принудительно остановлен.");
+                    break;
                 }
                 catch (AggregateException exeption)
                 {
@@ -102,9 +99,19 @@ namespace YandexCellInfoWF.Workers
                 }
 
             }
+            if (results.Count == 0)
+            {
+                console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - нет найденых.");
+                return true;
+            }
+            if (dontSaveFiles)
+            {
+                console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Найдено: {results.Count}");
+                return true;
+            }
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
-            console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Все найденные соты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
+            console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - найдено: {results.Count}. Результаты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
             return true;
         }

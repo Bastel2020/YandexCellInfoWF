@@ -64,7 +64,7 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text);
+                    await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text, dontSaveFileCheckBox.Checked);
                     ResetInterface();
                 }
             }
@@ -77,7 +77,7 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked);
+                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked, dontSaveFileCheckBox.Checked);
                     ResetInterface();
                 }
 

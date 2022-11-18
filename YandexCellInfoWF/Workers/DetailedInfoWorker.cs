@@ -19,7 +19,7 @@ namespace YandexCellInfoWF.Workers
 
         private static HttpClient client = new HttpClient();
 
-        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac)
+        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac, bool dontSaveFiles)
         {
             console.Text = $"[{DateTime.Now:T}] Начат подробный поиск БС";
 
@@ -31,8 +31,13 @@ namespace YandexCellInfoWF.Workers
                 console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен - нет найденых.");
                 return true;
             }
+            if (dontSaveFiles)
+            {
+                console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен. Найдено секторов: {result.Count}");
+                return true;
+            }    
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(result, Formatting.Indented));
-            console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен. Результаты сохранены в файл EnbDetailedInfo.txt.");
+            console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен, найдено секторов: {result.Count}. Результаты сохранены в файл EnbDetailedInfo.txt.");
             return true;
         }
 
@@ -50,7 +55,7 @@ namespace YandexCellInfoWF.Workers
 
             if (!InputParser.ParseInputWithoutSector(new InputData(mccString, mncString, enbsString, lacsString), out parsedData))
             {
-                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных. Завершение работы алгоритма.");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных. Проверьте входные данные.");
                 return null;
             }
 
@@ -144,7 +149,7 @@ namespace YandexCellInfoWF.Workers
                     currentEnbInfo.Sectors = currentEnbInfo.Sectors
                         .OrderBy(s => s.Number)
                         .ToList();
-                    console.AppendText($"\r\nНайдены сектора: {String.Join(", ", currentEnbInfo.Sectors.Select(s => s.Number))}");
+                    console.AppendText($"\r\nНайдены сектора: {string.Join(", ", currentEnbInfo.Sectors.Select(s => s.Number))}");
                     results.Add(currentEnbInfo);
                 }
             }
@@ -178,7 +183,7 @@ namespace YandexCellInfoWF.Workers
             }
             catch (Exception e)
             {
-                c if (repeated)
+                if (repeated)
                 {
                     console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
                     return result;
