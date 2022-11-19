@@ -19,28 +19,24 @@ namespace YandexCellInfoWF.Services
 
         private static HttpClient client = new HttpClient();
 
-        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, int sectorNum = -1, bool repeated = false)
+        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, bool repeated = false)
         {
-            ctSource = new CancellationTokenSource();
-            ct = ctSource.Token; //удОлить как можно скорее
-
-
-
-            var compressedData = GzipService.compressString(JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells)));
-
             var content = new MultipartFormDataContent("YaBoundary");
-            content.Add(new StringContent("\n\t"), "gzip");
-            content.Add(new ByteArrayContent(compressedData), "json");
-
-
+            await Task.Run(async () =>
+            {
+                var compressedData = await GzipService.CompressString(JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells)));
+                content.Add(new StringContent("gzip"), "\"gzip\"");
+                content.Add(new ByteArrayContent(compressedData), "\"json\"");
+            });
             var parsedResponse = new YandexResponse();
             var result = new BaseItemInfo();
             try
             {
+                ct.ThrowIfCancellationRequested();
 
-                var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsByteArrayAsync();
-                var decompressedResponse = Encoding.UTF8.GetString(GzipService.decompressBytes(response));
-                parsedResponse = JObject.Parse(decompressedResponse)["position"].ToObject<YandexResponse>();
+                var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
+                //var decompressedResponse = Encoding.UTF8.GetString(GzipService.decompressBytes(response));
+                parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
 
                 if (parsedResponse.LocationType.ToLower() == "gsm")
                 {
@@ -60,7 +56,7 @@ namespace YandexCellInfoWF.Services
                     return result;
                 }
                 console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
-                return await MakeRequest(console, commonInfo, cells, sectorNum, true);
+                return await MakeRequest(console, commonInfo, cells, ct, sectorNum, true);
             }
         }
     }

@@ -64,7 +64,7 @@ namespace YandexCellInfoWF.Workers
                 console.AppendText($"\r\n[{DateTime.Now:T}] Анализ Enb: {parsedData.Enbs[i]}");
 
                 currentEnb.Text = parsedData.Enbs[i].ToString();
-                progressBar.Value = (int)Math.Round((100d / parsedData.Enbs.Count) * i);
+                progressBar.Value = (int)Math.Round(100d / parsedData.Enbs.Count * i);
 
                 var cells = new List<CellInfo>();
                 var currentEnbInfo = new EnbFullInfo(parsedData.Enbs[i]);
@@ -77,7 +77,7 @@ namespace YandexCellInfoWF.Workers
                         {
                             allCommonCells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
                         }
-                    var checkAllCommonSectorsResult = await MakeRequest(console, commonInfo, allCommonCells);
+                    var checkAllCommonSectorsResult = await Services.RequestService.MakeRequest(console, commonInfo, allCommonCells, ct);
                     if (!checkAllCommonSectorsResult.Equals(new BaseItemInfo()))
                     {
                         foreach (var sector in commonSectors)
@@ -88,7 +88,7 @@ namespace YandexCellInfoWF.Workers
                                 cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
 
                             //var requestResult = await MakeRequest(console, commonInfo, cells, sector);
-                            var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, sector);
+                            var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, ct, sector);
 
                             if (requestResult == null)
                                 return results;
@@ -98,7 +98,7 @@ namespace YandexCellInfoWF.Workers
                                 if (checkLac)
                                 {
                                     var lacs = await DetectLacs(console, commonInfo, cells, sector);
-                                    requestResult.lac = String.Join(", ", lacs);
+                                    requestResult.lac = string.Join(", ", lacs);
                                 }
                                     currentEnbInfo.AddSector(requestResult);
                             }
@@ -117,7 +117,7 @@ namespace YandexCellInfoWF.Workers
                         foreach (var lac in parsedData.Lacs)
                             cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
                     }
-                    var requestResult = await MakeRequest(console, commonInfo, cells);
+                    var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, ct);
 
                     if (requestResult == null)
                         return results;
@@ -131,7 +131,7 @@ namespace YandexCellInfoWF.Workers
                             if (checkLac)
                             {
                                 var lacs = await DetectLacs(console, commonInfo, cells, firstSectorNum);
-                                requestResult.lac = String.Join(", ", lacs);
+                                requestResult.lac = string.Join(", ", lacs);
                             }
                             currentEnbInfo.AddSector(requestResult);
 
@@ -156,43 +156,6 @@ namespace YandexCellInfoWF.Workers
             return results;
         }
 
-        private static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, int sectorNum = -1, bool repeated = false)
-        {
-            var request = JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells));
-            var content = new StringContent("json=" + request, Encoding.UTF8, "application/json");
-            var parsedResponse = new YandexResponse();
-            var result = new BaseItemInfo();
-            try
-            {
-                await Task.Run(async () =>
-                {
-                    ct.ThrowIfCancellationRequested();
-
-                    var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
-                    parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
-                }, ctSource.Token);
-                if (parsedResponse.LocationType.ToLower() == "gsm")
-                {
-                    result = new BaseItemInfo(sectorNum, parsedResponse);                 
-                }
-                return result;
-            }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-            catch (Exception e)
-            {
-                if (repeated)
-                {
-                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
-                    return result;
-                }
-                console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
-                return await MakeRequest(console, commonInfo, cells, sectorNum, true);
-            }
-        }
-
         private static async Task<List<int>> DetectLacs(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, int sectorNum)
         {
             var result = new List<int>();
@@ -209,7 +172,7 @@ namespace YandexCellInfoWF.Workers
                 while (sectorsCache.Count > 0)
                 {
                     var current = sectorsCache.First();
-                    var response = await MakeRequest(console, commonInfo, sectorsCache.First(), sectorNum);
+                    var response = await Services.RequestService.MakeRequest(console, commonInfo, sectorsCache.First(), ct, sectorNum);
 
                     if (response == null)
                         return;

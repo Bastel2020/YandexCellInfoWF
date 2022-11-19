@@ -10,30 +10,35 @@ namespace YandexCellInfoWF.Services
 {
     public static class GzipService
     {
-        public static byte[] compressString(string input)
+        public static async Task<byte[]> CompressString(string input)
         {
-            var strBytes = Encoding.UTF8.GetBytes(input);
-            var result = new MemoryStream();
-            var lengthBytes = BitConverter.GetBytes(input.Length);
-            result.Write(lengthBytes, 0, 4);
+            var bytes = Encoding.UTF8.GetBytes(input);
+            var ms = new MemoryStream();
+            using (GZipStream zipStream = new GZipStream(ms, CompressionMode.Compress))
+            {
+                await zipStream.WriteAsync(bytes, 0, bytes.Length);
+                await zipStream.FlushAsync(); //Doesn't seem like Close() is available in UWP, so I changed it to Flush(). Is this the problem?
+            }
 
-            var compressionStream = new GZipStream(result, CompressionMode.Compress);
-            compressionStream.Write(strBytes, 0, input.Length);
-            compressionStream.Flush();
-            return result.ToArray();
+            // we create the data array here once the GZIP stream has been disposed
+            var data = ms.ToArray();
+            ms.Dispose();
+            return data;
         }
 
-        public static byte[] decompressBytes(byte[] input)
+        public static async Task<byte[]> DecompressBytes(byte[] input)
         {
-            var source = new MemoryStream(input);
-            byte[] lengthBytes = new byte[4];
-            source.Read(lengthBytes, 0, 4);
+            var ms = new MemoryStream();
+            using (GZipStream zipStream = new GZipStream(ms, CompressionMode.Compress))
+            {
+                await zipStream.WriteAsync(input, 0, input.Length);
+                await zipStream.FlushAsync(); //Doesn't seem like Close() is available in UWP, so I changed it to Flush(). Is this the problem?
+            }
 
-            var length = BitConverter.ToInt32(lengthBytes, 0);
-            var decompressionStream = new GZipStream(source, CompressionMode.Decompress);
-            var result = new byte[length];
-            decompressionStream.Read(result, 0, length);
-            return result;
+            // we create the data array here once the GZIP stream has been disposed
+            var data = ms.ToArray();
+            ms.Dispose();
+            return data;
         }
     }
 }
