@@ -35,7 +35,7 @@ namespace YandexCellInfoWF.Services
                 ct.ThrowIfCancellationRequested();
 
                 var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
-                //var decompressedResponse = Encoding.UTF8.GetString(GzipService.decompressBytes(response));
+
                 parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
 
                 if (parsedResponse.LocationType.ToLower() == "gsm")

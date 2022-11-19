@@ -14,10 +14,13 @@ namespace YandexCellInfoWF.Workers
 {
     public static class DetailedInfoWorker
     {
-        private static CancellationTokenSource ctSource;
-        private static CancellationToken ct;
+        private static CancellationTokenSource _ctSource;
+        private static CancellationToken _ct;
 
-        private static HttpClient client = new HttpClient();
+        private static HttpClient _client = new HttpClient();
+
+        private static YandexRequestCommonInfo _commonInfo;
+        private static TextBox _console;
 
         public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac, bool dontSaveFiles)
         {
@@ -43,11 +46,12 @@ namespace YandexCellInfoWF.Workers
 
         private static async Task<List<EnbFullInfo>> StartWorker(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac)
         {
-            ctSource = new CancellationTokenSource();
-            ct = ctSource.Token;
+            _ctSource = new CancellationTokenSource();
+            _ct = _ctSource.Token;
 
             var parsedData = new OutputData();
-            var commonInfo = new YandexRequestCommonInfo(apiKey);
+            _commonInfo = new YandexRequestCommonInfo(apiKey);
+            _console = console;
             var results = new List<EnbFullInfo>();
             var commonSectors = new List<int>();
             var otherSectors = Enumerable.Range(0, 256).ToList();
@@ -55,13 +59,13 @@ namespace YandexCellInfoWF.Workers
 
             if (!InputParser.ParseInputWithoutSector(new InputData(mccString, mncString, enbsString, lacsString), out parsedData))
             {
-                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных. Проверьте входные данные.");
+                _console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных. Проверьте входные данные.");
                 return null;
             }
 
             for (var i = 0; i < parsedData.Enbs.Count; i++)
             {
-                console.AppendText($"\r\n[{DateTime.Now:T}] Анализ Enb: {parsedData.Enbs[i]}");
+                _console.AppendText($"\r\n[{DateTime.Now:T}] Анализ Enb: {parsedData.Enbs[i]}");
 
                 currentEnb.Text = parsedData.Enbs[i].ToString();
                 progressBar.Value = (int)Math.Round(100d / parsedData.Enbs.Count * i);
@@ -69,42 +73,7 @@ namespace YandexCellInfoWF.Workers
                 var cells = new List<CellInfo>();
                 var currentEnbInfo = new EnbFullInfo(parsedData.Enbs[i]);
 
-                if (commonSectors.Count > 0)
-                {
-                    var allCommonCells = new List<CellInfo>();
-                    foreach (var sector in commonSectors)
-                        foreach(var lac in parsedData.Lacs)
-                        {
-                            allCommonCells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
-                        }
-                    var checkAllCommonSectorsResult = await Services.RequestService.MakeRequest(console, commonInfo, allCommonCells, ct);
-                    if (!checkAllCommonSectorsResult.Equals(new BaseItemInfo()))
-                    {
-                        foreach (var sector in commonSectors)
-                        {
-                            cells = new List<CellInfo>();
-
-                            foreach (var lac in parsedData.Lacs)
-                                cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
-
-                            //var requestResult = await MakeRequest(console, commonInfo, cells, sector);
-                            var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, ct, sector);
-
-                            if (requestResult == null)
-                                return results;
-
-                            else if (!requestResult.Equals(new BaseItemInfo()))
-                            {
-                                if (checkLac)
-                                {
-                                    var lacs = await DetectLacs(console, commonInfo, cells, sector);
-                                    requestResult.lac = string.Join(", ", lacs);
-                                }
-                                    currentEnbInfo.AddSector(requestResult);
-                            }
-                        }
-                    }
-                }
+                currentEnbInfo.Sectors.AddRange(await CheckFoundedSectorNumbers(commonSectors, parsedData, parsedData.Enbs[i]));
 
                 var sectorsCache = new List<List<int>> { otherSectors };
                 while (sectorsCache.Count > 0)
@@ -117,12 +86,12 @@ namespace YandexCellInfoWF.Workers
                         foreach (var lac in parsedData.Lacs)
                             cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
                     }
-                    var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, ct);
+                    var requestResult = await Services.RequestService.MakeRequest(_console, _commonInfo, cells, _ct);
 
                     if (requestResult == null)
                         return results;
 
-                    else if (!(requestResult.Equals(new BaseItemInfo())))
+                    else if (!requestResult.Equals(new BaseItemInfo()))
                     {
                         var firstSectorNum = currentSectors.First();
                         if (currentSectors.All(s => s == firstSectorNum))
@@ -130,7 +99,7 @@ namespace YandexCellInfoWF.Workers
                             requestResult.Number = firstSectorNum;
                             if (checkLac)
                             {
-                                var lacs = await DetectLacs(console, commonInfo, cells, firstSectorNum);
+                                var lacs = await DetectLacs(_console, _commonInfo, cells, firstSectorNum);
                                 requestResult.lac = string.Join(", ", lacs);
                             }
                             currentEnbInfo.AddSector(requestResult);
@@ -149,11 +118,68 @@ namespace YandexCellInfoWF.Workers
                     currentEnbInfo.Sectors = currentEnbInfo.Sectors
                         .OrderBy(s => s.Number)
                         .ToList();
-                    console.AppendText($"\r\nНайдены сектора: {string.Join(", ", currentEnbInfo.Sectors.Select(s => s.Number))}");
+                    _console.AppendText($"\r\nНайдены сектора: {string.Join(", ", currentEnbInfo.Sectors.Select(s => s.Number))}");
                     results.Add(currentEnbInfo);
                 }
             }
             return results;
+        }
+
+        private static async Task<List<BaseItemInfo>> CheckFoundedSectorNumbers(List<int> commonSectors, OutputData parsedData, int enbnum)
+        {
+            var result = new List<BaseItemInfo>();
+
+            if (commonSectors.Count > 0)
+            {
+                var allCommonCells = new List<CellInfo>();
+                foreach (var sector in commonSectors)
+                    foreach (var lac in parsedData.Lacs)
+                    {
+                        allCommonCells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: enbnum, sector: sector));
+                    }
+
+                var checkAllCommonSectorsResult = await Services.RequestService.MakeRequest(_console, _commonInfo, allCommonCells, _ct);
+                if (checkAllCommonSectorsResult == null)
+                    return result;
+
+                if (!checkAllCommonSectorsResult.Equals(new BaseItemInfo()))
+                {
+                    var sectorsChunks = Extensions.ChunkExtension
+                        .ToChunks(commonSectors, allCommonCells.Count / 2)
+                        .ToList();
+                    while (sectorsChunks.Count > 0)
+                    {
+                        var currentChunk = sectorsChunks.First();
+                        var cellsToFound = new List<CellInfo>();
+                        foreach (var sector in currentChunk)
+                            foreach (var lac in parsedData.Lacs)
+                                cellsToFound.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: enbnum, sector: sector));
+
+                        var checkChunkResult = await Services.RequestService.MakeRequest(_console, _commonInfo, cellsToFound, _ct);
+
+                        if (checkChunkResult == null)
+                            return result;
+
+                        if (checkChunkResult.Equals(new BaseItemInfo()))
+                        {
+                            sectorsChunks.Remove(currentChunk);
+                            continue;
+                        }
+
+                        if (currentChunk.Count > 1)
+                        {
+                            var newChunk = Extensions.ChunkExtension
+                                .ToChunks(currentChunk, currentChunk.Count / 2)
+                                .ToList();
+                            sectorsChunks.AddRange(newChunk);
+                        }
+
+                        result.Add(checkChunkResult);
+                        sectorsChunks.Remove(currentChunk);
+                    }
+                }
+            }
+            return result;
         }
 
         private static async Task<List<int>> DetectLacs(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, int sectorNum)
@@ -172,7 +198,7 @@ namespace YandexCellInfoWF.Workers
                 while (sectorsCache.Count > 0)
                 {
                     var current = sectorsCache.First();
-                    var response = await Services.RequestService.MakeRequest(console, commonInfo, sectorsCache.First(), ct, sectorNum);
+                    var response = await Services.RequestService.MakeRequest(console, commonInfo, sectorsCache.First(), _ct, sectorNum);
 
                     if (response == null)
                         return;
@@ -194,8 +220,8 @@ namespace YandexCellInfoWF.Workers
 
         public static void CancelTask()
         {
-            if (ctSource != null)
-                ctSource.Cancel();
+            if (_ctSource != null)
+                _ctSource.Cancel();
         }
     }
 }
