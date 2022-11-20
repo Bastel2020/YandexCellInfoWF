@@ -89,6 +89,7 @@
     <Compile Include="FormChanger.cs" />
     <Compile Include="Models\CellInfo.cs" />
     <Compile Include="Models\BaseItemInfo.cs" />
+    <Compile Include="Models\DetailedInfoResults.cs" />
     <Compile Include="Models\EnbFullInfo.cs" />
     <Compile Include="Models\InputData.cs" />
     <Compile Include="Models\LocationInfo.cs" />

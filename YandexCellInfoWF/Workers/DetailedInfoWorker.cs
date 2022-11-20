@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using YandexCellInfoWF.Extensions;
 using YandexCellInfoWF.Models;
 
 namespace YandexCellInfoWF.Workers
@@ -38,8 +39,10 @@ namespace YandexCellInfoWF.Workers
             {
                 console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен. Найдено секторов: {result.Count}");
                 return true;
-            }    
-            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(result, Formatting.Indented));
+            }
+            var preparedResults = new DetailedInfoResults(mccString, mncString, enbsString, lacsString, result);
+
+            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(preparedResults, Formatting.Indented));
             console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен, найдено секторов: {result.Count}. Результаты сохранены в файл EnbDetailedInfo.txt.");
             return true;
         }
@@ -53,7 +56,7 @@ namespace YandexCellInfoWF.Workers
             _commonInfo = new YandexRequestCommonInfo(apiKey);
             _console = console;
             var results = new List<EnbFullInfo>();
-            var commonSectors = new List<int>();
+            commonSectors = new List<int>();
             var otherSectors = Enumerable.Range(0, 256).ToList();
 
 
@@ -88,6 +91,8 @@ namespace YandexCellInfoWF.Workers
                     }
                     var requestResult = await Services.RequestService.MakeRequest(_console, _commonInfo, cells, _ct);
 
+                    requstCount++;
+                    
                     if (requestResult == null)
                         return results;
 
@@ -108,7 +113,7 @@ namespace YandexCellInfoWF.Workers
                             otherSectors.Remove(firstSectorNum);
                         }
                         else
-                            sectorsCache.AddRange(Extensions.ChunkExtension.ToChunks(currentSectors, currentSectors.Count / 2));
+                            sectorsCache.AddRange(Extensions.ChunkExtension.ToChunks(currentSectors, currentSectors.Count == 1 ? 0 : (int)Math.Ceiling(currentSectors.Count / 2d)));
                     }
 
                     sectorsCache.Remove(currentSectors);

@@ -8,8 +8,8 @@ namespace YandexCellInfoWF.Models
 {
     public class BaseItemInfo : LocationInfo
     {
-        public int Number;
-        public string lac;
+        public int Number { get; set; }
+        public string LAC { get; set; }
 
         public BaseItemInfo(int num, float latitude, float longitude, float precision)
         {
