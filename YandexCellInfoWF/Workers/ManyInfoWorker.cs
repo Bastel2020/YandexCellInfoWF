@@ -10,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF.Workers
 {
@@ -25,6 +26,10 @@ namespace YandexCellInfoWF.Workers
             ctSource = new CancellationTokenSource();
             ct = ctSource.Token;
 
+            var successInfo = new bool[25];
+            var multiplierBan = false;
+            Func<float> successRate = new Func<float>(() => (float)successInfo.Where(v => v == true).Count() / successInfo.Length);
+
             console.Text = $"[{DateTime.Now:T}] Начат поиск всех БС по заданным параметрам.";
 
             var parsedData = new OutputData();
@@ -39,6 +44,34 @@ namespace YandexCellInfoWF.Workers
 
             for (var i = 0; i < parsedData.Enbs.Count; i++)
             {
+                var multiplier = successRate() < 0.08 ? successRate() < 0.005 ? 20 : 5 : 2;
+                if (i > successInfo.Length && i + multiplier < parsedData.Enbs.Count && successRate() < 0.35 && !multiplierBan)
+                {
+                    var c = successRate();
+                    var multiCells = new List<CellInfo>();
+                    foreach (var lac in parsedData.Lacs)
+                    {
+                        for(int k = i; k < i + multiplier; k++)
+                            foreach (var sector in parsedData.Sectors)
+                                multiCells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[k], sector: sector));
+                    }
+                    var multiResponse = await RequestService.MakeRequest(console, commonInfo, multiCells, ct);
+                    if (multiResponse == null)
+                        break;
+                    if (multiResponse.Equals(new BaseItemInfo()))
+                    {
+                        currentEnb.Text = parsedData.Enbs[i + multiplier].ToString();
+                        progressBar.Value = (int)Math.Round((100d / parsedData.Enbs.Count) * (i + multiplier));
+                        i += multiplier - 1;
+                        for (int k = i; k < i + multiplier; k++)
+                        {
+                            successInfo[k % successInfo.Length] = false;
+                        }
+                        continue;
+                    }
+                    else
+                        multiplierBan = true;
+                }
                 currentEnb.Text = parsedData.Enbs[i].ToString();
                 progressBar.Value = (int)Math.Round((100d / parsedData.Enbs.Count) * i);
 
@@ -48,56 +81,24 @@ namespace YandexCellInfoWF.Workers
                     foreach (var sector in parsedData.Sectors)
                         cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
                 }
-                var request = JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells));
-                var content = new StringContent("json=" + request, Encoding.UTF8, "application/json");
 
-                try
-                {
-                    var parsedResponse = new YandexResponse();
-
-                    await Task.Run(() =>
-                    {
-                        ct.ThrowIfCancellationRequested();
-
-                        var response = client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync().Result;
-                        parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
-                    }, ctSource.Token);
-                    if (parsedResponse.LocationType.ToLower() == "gsm")
-                    {
-                        results.Add(new BaseItemInfo(parsedData.Enbs[i], parsedResponse));
-                        console.AppendText($"\r\n[{DateTime.Now:T}] Найдено! Enb: {parsedData.Enbs[i]}." +
-                            $"\r\nGPS: {parsedResponse.Latitude:0.00000}, {parsedResponse.Longitude:0.00000}");
-                        console.ScrollToCaret();
-                    }
-                }
-                catch (OperationCanceledException)
-                {
-                    console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот принудительно остановлен.");
+                var response = await RequestService.MakeRequest(console, commonInfo, cells, ct);
+                if (response == null)
                     break;
-                }
-                catch (AggregateException exeption)
+                if (!response.Equals(new BaseItemInfo()))
                 {
-                    var exeptions = exeption.InnerExceptions;
-                    if (exeptions.Any(e => e.GetType() == typeof(HttpRequestException)))
-                        console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка получения данных. Пропуск БС #{parsedData.Enbs[i]}.");
-                    else
-                    {
-                        var errorsString = String.Join(", ", exeptions.Select(e => e.Message));
-                        console.AppendText($"\r\n[{DateTime.Now:T}] Произошли ошибки: {errorsString}. Завершение работы программы.");
-                        break;
-                    }
+                    successInfo[i % successInfo.Length] = true;
+                    response.Number = parsedData.Enbs[i];
+                    results.Add(response);
+                    console.AppendText($"\r\n[{DateTime.Now:T}] Найдено! Enb: {parsedData.Enbs[i]}." +
+                        $"\r\nGPS: {response.Latitude:0.00000}, {response.Longitude:0.00000}");
+                    console.ScrollToCaret();
+                    multiplierBan = false;
                 }
-                catch (Newtonsoft.Json.JsonReaderException e)
+                else
                 {
-                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка обработки JSON. Возможно, что запрос слишком велик. Уменьшите число LAC и секторов. Повтор через 3 сек.");
-                    Thread.Sleep(3000);
+                    successInfo[i % successInfo.Length] = false;
                 }
-                catch (Exception e)
-                {
-                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message}. Завершение работы программы.");
-                    break;
-                }
-
             }
             if (results.Count == 0)
             {

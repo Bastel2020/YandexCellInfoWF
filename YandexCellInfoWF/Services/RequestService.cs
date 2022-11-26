@@ -9,55 +9,66 @@ using System.Threading.Tasks;
 using YandexCellInfoWF.Models;
 using System.Windows.Forms;
 using System.Threading;
+using System.Diagnostics;
 
 namespace YandexCellInfoWF.Services
 {
     public class RequestService
     {
-        private static CancellationTokenSource ctSource;
-        private static CancellationToken ct;
-
         private static HttpClient client = new HttpClient();
 
         public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, bool repeated = false)
         {
-            var content = new MultipartFormDataContent("YaBoundary");
-            await Task.Run(async () =>
+            return await Task.Run(async () =>
             {
-                var compressedData = await GzipService.CompressString(JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells)));
-                content.Add(new StringContent("gzip"), "\"gzip\"");
-                content.Add(new ByteArrayContent(compressedData), "\"json\"");
-            });
-            var parsedResponse = new YandexResponse();
-            var result = new BaseItemInfo();
-            try
-            {
-                ct.ThrowIfCancellationRequested();
+                var result = new BaseItemInfo();
 
-                var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
-                //var decompressedResponse = Encoding.UTF8.GetString(GzipService.decompressBytes(response));
-                parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
+                try
+                {
+                    dynamic content;
+                    if (cells.Count < 1000)
+                    {
+                        var request = JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells));
+                        content = new StringContent("json=" + request, Encoding.UTF8, "application/json");
+                    }
+                    else
+                    {
+                        content = new MultipartFormDataContent("YaBoundary");
 
-                if (parsedResponse.LocationType.ToLower() == "gsm")
-                {
-                    result = new BaseItemInfo(sectorNum, parsedResponse);
-                }
-                return result;
-            }
-            catch (OperationCanceledException)
-            {
-                return null;
-            }
-            catch (Exception e)
-            {
-                if (repeated)
-                {
-                    console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
+                        var compressedData = await GzipService.CompressString(JsonConvert.SerializeObject(new YandexRequest(commonInfo, cells)));
+                        content.Add(new StringContent("gzip"), "\"gzip\"");
+                        content.Add(new ByteArrayContent(compressedData), "\"json\"");
+
+                    }
+                    var parsedResponse = new YandexResponse();
+
+                    ct.ThrowIfCancellationRequested();
+
+                    var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
+
+                    parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
+
+                    if (parsedResponse.LocationType.ToLower() == "gsm")
+                    {
+                        result = new BaseItemInfo(sectorNum, parsedResponse);
+                    }
                     return result;
                 }
-                console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
-                return await MakeRequest(console, commonInfo, cells, ct, sectorNum, true);
-            }
+                catch (OperationCanceledException)
+                {
+                    return null;
+                }
+                catch (Exception e)
+                {
+                    if (repeated)
+                    {
+                        //console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
+                        return result;
+                    }
+                    //console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
+                    return await MakeRequest(console, commonInfo, cells, ct, sectorNum, true);
+                }
+            });
         }
     }
 }

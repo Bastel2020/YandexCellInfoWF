@@ -101,7 +101,7 @@ namespace YandexCellInfoWF.Workers
                                     var lacs = await DetectLacs(console, commonInfo, cells, sector);
                                     requestResult.lac = string.Join(", ", lacs);
                                 }
-                                    currentEnbInfo.AddSector(requestResult);
+                                currentEnbInfo.AddSector(requestResult);
                             }
                         }
                     }
