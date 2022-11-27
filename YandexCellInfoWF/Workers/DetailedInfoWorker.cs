@@ -9,6 +9,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF.Workers
 {
@@ -19,7 +20,7 @@ namespace YandexCellInfoWF.Workers
 
         private static HttpClient client = new HttpClient();
 
-        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac, bool dontSaveFiles)
+        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, bool checkLac, CheckBox dontSaveFiles)
         {
             console.Text = $"[{DateTime.Now:T}] Начат подробный поиск БС";
 
@@ -31,12 +32,14 @@ namespace YandexCellInfoWF.Workers
                 console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен - нет найденых.");
                 return true;
             }
-            if (dontSaveFiles)
+            if (dontSaveFiles.Checked)
             {
                 console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен. Найдено секторов: {result.Count}");
                 return true;
             }
             var preparedResults = new DetailedInfoResults(mccString, mncString, enbsString, lacsString, result);
+
+            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} map.kml", await KmlService.GetKMLAsync(preparedResults.Enbs));
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(preparedResults, Formatting.Indented));
             console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен, найдено секторов: {result.Count}. Результаты сохранены в файл EnbDetailedInfo.txt.");
             return true;
@@ -88,7 +91,6 @@ namespace YandexCellInfoWF.Workers
                             foreach (var lac in parsedData.Lacs)
                                 cells.Add(new CellInfo(parsedData.Mcc, parsedData.Mnc, lac, enbNumber: parsedData.Enbs[i], sector: sector));
 
-                            //var requestResult = await MakeRequest(console, commonInfo, cells, sector);
                             var requestResult = await Services.RequestService.MakeRequest(console, commonInfo, cells, ct, sector);
 
                             if (requestResult == null)

@@ -21,7 +21,7 @@ namespace YandexCellInfoWF.Workers
 
         private static HttpClient client = new HttpClient();
 
-        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, string sectorsString, bool dontSaveFiles)
+        public static async Task<bool> SearchEnbs(TextBox console, ProgressBar progressBar, Label currentEnb, string apiKey, string mccString, string mncString, string enbsString, string lacsString, string sectorsString, CheckBox dontSaveFiles)
         {
             ctSource = new CancellationTokenSource();
             ct = ctSource.Token;
@@ -105,13 +105,17 @@ namespace YandexCellInfoWF.Workers
                 console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - нет найденых.");
                 return true;
             }
-            if (dontSaveFiles)
+            if (dontSaveFiles.Checked)
             {
                 console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Найдено: {results.Count}");
                 return true;
             }
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
             System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
+
+            var kml = await KmlService.GetKMLAsync(results);
+            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now.ToString("ddMMyy-hhmmss")} {mccString}-{mncString} map.kml", kml);
+
             console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - найдено: {results.Count}. Результаты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
             return true;

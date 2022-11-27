@@ -1,8 +1,14 @@
-﻿using System.Diagnostics;
+﻿using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.Drawing;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF
 {
@@ -64,7 +70,7 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text, dontSaveFileCheckBox.Checked);
+                    await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text, dontSaveFileCheckBox);
                     ResetInterface();
                 }
             }
@@ -77,7 +83,7 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked, dontSaveFileCheckBox.Checked);
+                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked, dontSaveFileCheckBox);
                     ResetInterface();
                 }
 
@@ -153,6 +159,58 @@ namespace YandexCellInfoWF
         private void saveManyFilesCheckBox_CheckedChanged(object sender, System.EventArgs e)
         {
 
+        }
+
+        private void fileToKmlButton_Click(object sender, System.EventArgs e)
+        {
+            var dialog = new OpenFileDialog();
+            dialog.Multiselect = true;
+            var result = dialog.ShowDialog();
+            if (result != DialogResult.OK)           
+                return;
+
+            try
+            {
+                var serializerSettings = new JsonSerializerSettings();
+                serializerSettings.MissingMemberHandling = MissingMemberHandling.Error;
+                var files = dialog.FileNames
+                    .Select(file => System.IO.File.ReadAllText(file))
+                    .Select(str =>
+                    {
+                        try { return (object)JsonConvert.DeserializeObject<List<BaseItemInfo>>(str, serializerSettings); }
+                        catch
+                        {
+                            try
+                            {
+                                return (object)JsonConvert.DeserializeObject<List<EnbFullInfo>>(str);
+                            }
+                            catch
+                            {
+                                var _json = JObject.Parse(str);
+                                var sampledataJson = JArray.Parse(_json["Enbs"].ToString());
+                                return (object)JsonConvert.DeserializeObject<List<EnbFullInfo>>(sampledataJson.ToString());
+                            }
+                        }
+                    })
+                    .Select(obj =>
+                    {
+                        if (obj is List<EnbFullInfo>)
+                            return KmlService.GetKML((List<EnbFullInfo>)obj);
+                        else
+                            return KmlService.GetKML((List<BaseItemInfo>)obj);
+                    });
+                var counter = 0;
+                foreach(var file in files)
+                {
+                    System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{dialog.SafeFileNames[counter]} map.kml", file);
+                    counter++;
+                }
+                MessageBox.Show($"Успешно обработано {counter} файл(ов).");
+            }
+            catch(Exception ex)
+            {
+                MessageBox.Show($"Произошла ошибка! Проверьте, что на вход переданы файлы DeailedInfo или AllInfo. \r\nОшибка: {ex.Message}.", "Ошибка при обработке файлов");
+            }
         }
     }
 }

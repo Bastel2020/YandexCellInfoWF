@@ -18,14 +18,15 @@ namespace YandexCellInfoWF.Models
         {
             get
             {
-                if (Enbs == null)
-                    return null;
-
-                return Enbs
-                    .SelectMany(e => e.Sectors.Select(s => s.Number))
-                    .GroupBy(num => num)
-                    .OrderBy(num => num.Key)
-                    .Select(k => $"{k.Key}: {k.Count()}");
+                try
+                {
+                    return Enbs
+                        .SelectMany(e => e.Sectors.Select(s => s.Number))
+                        .GroupBy(num => num)
+                        .OrderBy(num => num.Key)
+                        .Select(k => $"{k.Key}: {k.Count()}");
+                }
+                catch { return null; }
             }
         }
 

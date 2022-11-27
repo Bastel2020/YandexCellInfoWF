@@ -35,6 +35,7 @@ namespace YandexCellInfoWF
             this.allSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.detaliedSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.searchModeGroupBox = new System.Windows.Forms.GroupBox();
+            this.dontSaveFileCheckBox = new System.Windows.Forms.CheckBox();
             this.detailedSearchDescrLabel = new System.Windows.Forms.Label();
             this.allSearrchDescrLabel = new System.Windows.Forms.Label();
             this.detectLacCheckBox = new System.Windows.Forms.CheckBox();
@@ -59,7 +60,7 @@ namespace YandexCellInfoWF
             this.progressLabel = new System.Windows.Forms.Label();
             this.currentEnbTextLabel = new System.Windows.Forms.Label();
             this.currentEnbLabel = new System.Windows.Forms.Label();
-            this.dontSaveFileCheckBox = new System.Windows.Forms.CheckBox();
+            this.fileToKmlButton = new System.Windows.Forms.Button();
             this.searchModeGroupBox.SuspendLayout();
             this.ConsoleGroupBox.SuspendLayout();
             this.generalSettingsGroupBox.SuspendLayout();
@@ -122,6 +123,7 @@ namespace YandexCellInfoWF
             // 
             // searchModeGroupBox
             // 
+            this.searchModeGroupBox.Controls.Add(this.fileToKmlButton);
             this.searchModeGroupBox.Controls.Add(this.dontSaveFileCheckBox);
             this.searchModeGroupBox.Controls.Add(this.detailedSearchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.allSearrchDescrLabel);
@@ -138,6 +140,16 @@ namespace YandexCellInfoWF
             this.searchModeGroupBox.TabStop = false;
             this.searchModeGroupBox.Text = "3. Режим поиска и подробные настройки";
             this.searchModeGroupBox.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // dontSaveFileCheckBox
+            // 
+            this.dontSaveFileCheckBox.AutoSize = true;
+            this.dontSaveFileCheckBox.Location = new System.Drawing.Point(247, 220);
+            this.dontSaveFileCheckBox.Name = "dontSaveFileCheckBox";
+            this.dontSaveFileCheckBox.Size = new System.Drawing.Size(132, 17);
+            this.dontSaveFileCheckBox.TabIndex = 27;
+            this.dontSaveFileCheckBox.Text = "Не сохранять файлы";
+            this.dontSaveFileCheckBox.UseVisualStyleBackColor = true;
             // 
             // detailedSearchDescrLabel
             // 
@@ -385,15 +397,16 @@ namespace YandexCellInfoWF
             this.currentEnbLabel.TabIndex = 17;
             this.currentEnbLabel.Text = "0";
             // 
-            // dontSaveFileCheckBox
+            // fileToKmlButton
             // 
-            this.dontSaveFileCheckBox.AutoSize = true;
-            this.dontSaveFileCheckBox.Location = new System.Drawing.Point(247, 220);
-            this.dontSaveFileCheckBox.Name = "dontSaveFileCheckBox";
-            this.dontSaveFileCheckBox.Size = new System.Drawing.Size(132, 17);
-            this.dontSaveFileCheckBox.TabIndex = 27;
-            this.dontSaveFileCheckBox.Text = "Не сохранять файлы";
-            this.dontSaveFileCheckBox.UseVisualStyleBackColor = true;
+            this.fileToKmlButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.fileToKmlButton.Location = new System.Drawing.Point(392, 154);
+            this.fileToKmlButton.Name = "fileToKmlButton";
+            this.fileToKmlButton.Size = new System.Drawing.Size(100, 20);
+            this.fileToKmlButton.TabIndex = 28;
+            this.fileToKmlButton.Text = "KML из файла...";
+            this.fileToKmlButton.UseVisualStyleBackColor = true;
+            this.fileToKmlButton.Click += new System.EventHandler(this.fileToKmlButton_Click);
             // 
             // Form1
             // 
@@ -460,6 +473,7 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.Label currentEnbTextLabel;
         private System.Windows.Forms.Label currentEnbLabel;
         private System.Windows.Forms.CheckBox dontSaveFileCheckBox;
+        private System.Windows.Forms.Button fileToKmlButton;
     }
 }
 

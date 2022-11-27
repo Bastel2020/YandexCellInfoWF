@@ -6,31 +6,18 @@ using System.Threading.Tasks;
 
 namespace YandexCellInfoWF.Models
 {
-    public class EnbFullInfo : LocationInfo
+    public class EnbFullInfoJson : LocationInfo
     {
         public int Enb;
-        public List<BaseItemInfo> Sectors
-        {
-            get { return _sectors; }
-            set
-            {
-                _sectors = value;
-                if (value.Count > 0)
-                {
-                    Longitude = value.Select(s => s.Longitude).Average();
-                    Latitude = value.Select(s => s.Latitude).Average();
-                }
-            }
-        }
-        private List<BaseItemInfo>  _sectors;
+        public List<BaseItemInfo> Sectors { get; set; }
 
-        public EnbFullInfo() { Sectors = new List<BaseItemInfo>(); }
-        public EnbFullInfo(int EnbNum)
+        public EnbFullInfoJson() { Sectors = new List<BaseItemInfo>(); }
+        public EnbFullInfoJson(int EnbNum)
         {
             Enb = EnbNum;
             Sectors = new List<BaseItemInfo>();
         }
-        public EnbFullInfo(int EnbNum, List<BaseItemInfo> sectors)
+        public EnbFullInfoJson(int EnbNum, List<BaseItemInfo> sectors)
         {
             Enb = EnbNum;
             Sectors = sectors;

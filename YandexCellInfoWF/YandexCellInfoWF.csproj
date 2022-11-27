@@ -62,10 +62,14 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="Newtonsoft.Json, Version=13.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
-      <HintPath>..\packages\Newtonsoft.Json.13.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
+      <HintPath>..\packages\Newtonsoft.Json.13.0.2\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+    <Reference Include="SharpKml.Core, Version=5.2.0.0, Culture=neutral, PublicKeyToken=9bb853c026a5c0ac, processorArchitecture=MSIL">
+      <HintPath>..\packages\SharpKml.Core.5.2.0\lib\net45\SharpKml.Core.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.IO.Compression" />
     <Reference Include="System.Numerics" />
     <Reference Include="System.Windows.Forms.DataVisualization" />
     <Reference Include="System.Xml.Linq" />
@@ -90,6 +94,7 @@
     <Compile Include="Models\CellInfo.cs" />
     <Compile Include="Models\BaseItemInfo.cs" />
     <Compile Include="Models\DetailedInfoResults.cs" />
+    <Compile Include="Models\EnbFullInfoJson.cs" />
     <Compile Include="Models\EnbFullInfo.cs" />
     <Compile Include="Models\InputData.cs" />
     <Compile Include="Models\LocationInfo.cs" />
@@ -103,6 +108,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Services\GzipService.cs" />
+    <Compile Include="Services\KmlService.cs" />
     <Compile Include="Services\RequestService.cs" />
     <Compile Include="Services\SettingsLoaderService.cs" />
     <Compile Include="Workers\DetailedInfoWorker.cs" />
