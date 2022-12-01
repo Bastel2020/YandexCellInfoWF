@@ -83,7 +83,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Extensions\ChunkExtension.cs" />
+    <Compile Include="Helpers\ChunkExtension.cs" />
     <Compile Include="Form1.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -91,6 +91,7 @@
       <DependentUpon>Form1.cs</DependentUpon>
     </Compile>
     <Compile Include="FormChanger.cs" />
+    <Compile Include="Helpers\Math.cs" />
     <Compile Include="Models\CellInfo.cs" />
     <Compile Include="Models\BaseItemInfo.cs" />
     <Compile Include="Models\DetailedInfoResults.cs" />

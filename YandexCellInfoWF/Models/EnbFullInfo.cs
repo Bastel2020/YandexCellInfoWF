@@ -1,4 +1,5 @@
-﻿using System;
+﻿using SharpKml.Base;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -14,12 +15,25 @@ namespace YandexCellInfoWF.Models
             get { return _sectors; }
             set
             {
-                _sectors = value;
+                
                 if (value.Count > 0)
                 {
-                    Longitude = value.Select(s => s.Longitude).Average();
-                    Latitude = value.Select(s => s.Latitude).Average();
+                    var lonValues = value.Select(s => s.Longitude);
+                    var lonMedian = Helpers.Math.GetMedian(lonValues);
+                    Longitude = lonValues.Where(v => Math.Abs(v - lonMedian) < 0.3d).Average();
+
+                    var latValues = value.Select(s => s.Latitude);
+                    var latMedian = Helpers.Math.GetMedian(latValues);
+                    Latitude = latValues.Where(v => Math.Abs(v - latMedian) < 0.3d).Average();
                 }
+                _sectors = value.Select(v =>
+                {
+                    if (Math.Abs(v.Latitude - Latitude) > 0.3)
+                        v.Latitude = Latitude;
+                    if (Math.Abs(v.Longitude - Longitude) > 0.3)
+                        v.Longitude = Longitude;
+                    return v;
+                }).ToList();
             }
         }
         private List<BaseItemInfo>  _sectors;
