@@ -6,10 +6,9 @@ using System.Threading.Tasks;
 
 namespace YandexCellInfoWF.Models.Settings
 {
-    public class SettingsBase
+    public class RequsetsCountInfo
     {
-        public DefaultFields DefaultFields;
-        public PreloadSectors[] PreloadSectors;
-        public int? RequsetsLimit;
+        public DateTime? MoscowTimeZoneDate { get; set; }
+        public int? RequsetsCount { get; set; }
     }
 }

@@ -10,19 +10,27 @@ using YandexCellInfoWF.Models;
 using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
+using YandexCellInfoWF.Service;
 
 namespace YandexCellInfoWF.Services
 {
     public class RequestService
     {
         private static HttpClient client = new HttpClient();
+        private static int requsetsCounter = 0;
 
-        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, bool repeated = false)
+        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, Label requsetsTodayCount, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, bool repeated = false)
         {
-            return await Task.Run(async () =>
+            requsetsCounter = int.Parse(requsetsTodayCount.Text);
+            if (requsetsCounter == SettingsLoaderService.GetRequsetsLimit())
+            {
+                var result = MessageBox.Show("Превышен лимит запросов! Закругляемся?", "Яндексу ты не нравишься", MessageBoxButtons.YesNo);
+                if (result == DialogResult.Yes)
+                    return null;
+            }
+            var taskResult = await Task.Run(async () =>
             {
                 var result = new BaseItemInfo();
-
                 try
                 {
                     dynamic content;
@@ -46,6 +54,8 @@ namespace YandexCellInfoWF.Services
 
                     var response = await client.PostAsync("http://api.lbs.yandex.net/geolocation", content).Result.Content.ReadAsStringAsync();
 
+                    requsetsCounter++;
+
                     parsedResponse = JObject.Parse(response)["position"].ToObject<YandexResponse>();
 
                     if (parsedResponse.LocationType.ToLower() == "gsm")
@@ -66,9 +76,11 @@ namespace YandexCellInfoWF.Services
                         return result;
                     }
                     //console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
-                    return await MakeRequest(console, commonInfo, cells, ct, sectorNum, true);
+                    return await MakeRequest(console, commonInfo, requsetsTodayCount, cells, ct, sectorNum, true);
                 }
             });
+            try { requsetsTodayCount.Text = requsetsCounter.ToString(); } catch { }
+            return taskResult;
         }
     }
 }

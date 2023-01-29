@@ -44,6 +44,10 @@ namespace YandexCellInfoWF.Workers
                     })
                     .ToList();
                 output.Enbs.AddRange(enbToAdd);
+
+                output.Enbs = output.Enbs
+                    .Distinct()
+                    .ToList();
             }
             catch { return false; }
 
@@ -69,7 +73,12 @@ namespace YandexCellInfoWF.Workers
                         }
                     })
                     .ToList();
-                output.Lacs.AddRange(lacsToAdd);
+                output.Lacs
+                    .AddRange(lacsToAdd);
+
+                output.Lacs = output.Lacs
+                    .Distinct()
+                    .ToList();
             }
             catch { return false; }
 
@@ -78,13 +87,9 @@ namespace YandexCellInfoWF.Workers
 
         public static bool ParseInputWithSector(InputData input, out OutputData output)
         {
-            output = new OutputData();
-            if (!ParseInputWithoutSector(input, out OutputData output1))
-            {
-                output = output1;
+            if (!ParseInputWithoutSector(input, out output))
                 return false;
-            }
-            output = output1;
+
             try
             {
                 var sectorsToAdd = new List<int>();
@@ -108,6 +113,10 @@ namespace YandexCellInfoWF.Workers
                     })
                     .ToList();
                 output.Sectors.AddRange(sectorsToAdd);
+
+                output.Sectors = output.Sectors
+                    .Distinct()
+                    .ToList();
             }
             catch { return false; }
 

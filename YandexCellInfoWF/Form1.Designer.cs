@@ -35,18 +35,18 @@ namespace YandexCellInfoWF
             this.allSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.detaliedSearchRadioButton = new System.Windows.Forms.RadioButton();
             this.searchModeGroupBox = new System.Windows.Forms.GroupBox();
+            this.fileToKmlButton = new System.Windows.Forms.Button();
             this.dontSaveFileCheckBox = new System.Windows.Forms.CheckBox();
             this.detailedSearchDescrLabel = new System.Windows.Forms.Label();
+            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
             this.allSearrchDescrLabel = new System.Windows.Forms.Label();
             this.detectLacCheckBox = new System.Windows.Forms.CheckBox();
             this.StartButton = new System.Windows.Forms.Button();
             this.sectorsTextBox = new System.Windows.Forms.TextBox();
             this.sectorsLabel = new System.Windows.Forms.Label();
-            this.sendDataCheckBox = new System.Windows.Forms.CheckBox();
             this.ConsoleGroupBox = new System.Windows.Forms.GroupBox();
             this.ConsoleTextBox = new System.Windows.Forms.TextBox();
             this.generalSettingsGroupBox = new System.Windows.Forms.GroupBox();
-            this.EnbDescrLinkLabel = new System.Windows.Forms.LinkLabel();
             this.enbsTextBox = new System.Windows.Forms.TextBox();
             this.LacTextBox = new System.Windows.Forms.TextBox();
             this.enbsLabel = new System.Windows.Forms.Label();
@@ -60,7 +60,10 @@ namespace YandexCellInfoWF
             this.progressLabel = new System.Windows.Forms.Label();
             this.currentEnbTextLabel = new System.Windows.Forms.Label();
             this.currentEnbLabel = new System.Windows.Forms.Label();
-            this.fileToKmlButton = new System.Windows.Forms.Button();
+            this.TotalFoundLabel = new System.Windows.Forms.Label();
+            this.TotalFoundCounter = new System.Windows.Forms.Label();
+            this.RequsetsTodayLabel = new System.Windows.Forms.Label();
+            this.RequsetsTodayCounter = new System.Windows.Forms.Label();
             this.searchModeGroupBox.SuspendLayout();
             this.ConsoleGroupBox.SuspendLayout();
             this.generalSettingsGroupBox.SuspendLayout();
@@ -104,7 +107,6 @@ namespace YandexCellInfoWF
             this.allSearchRadioButton.Name = "allSearchRadioButton";
             this.allSearchRadioButton.Size = new System.Drawing.Size(236, 17);
             this.allSearchRadioButton.TabIndex = 6;
-            this.allSearchRadioButton.TabStop = true;
             this.allSearchRadioButton.Text = "Поиск всех БС по заданным параметрам\r\n";
             this.allSearchRadioButton.UseVisualStyleBackColor = true;
             this.allSearchRadioButton.CheckedChanged += new System.EventHandler(this.allSearchRadioButton_CheckedChanged);
@@ -116,7 +118,6 @@ namespace YandexCellInfoWF
             this.detaliedSearchRadioButton.Name = "detaliedSearchRadioButton";
             this.detaliedSearchRadioButton.Size = new System.Drawing.Size(174, 17);
             this.detaliedSearchRadioButton.TabIndex = 7;
-            this.detaliedSearchRadioButton.TabStop = true;
             this.detaliedSearchRadioButton.Text = "Подробная информация о БС\r\n";
             this.detaliedSearchRadioButton.UseVisualStyleBackColor = true;
             this.detaliedSearchRadioButton.CheckedChanged += new System.EventHandler(this.detaliedSearchRadioButton_CheckedChanged);
@@ -126,6 +127,7 @@ namespace YandexCellInfoWF
             this.searchModeGroupBox.Controls.Add(this.fileToKmlButton);
             this.searchModeGroupBox.Controls.Add(this.dontSaveFileCheckBox);
             this.searchModeGroupBox.Controls.Add(this.detailedSearchDescrLabel);
+            this.searchModeGroupBox.Controls.Add(this.sendDataCheckBox);
             this.searchModeGroupBox.Controls.Add(this.allSearrchDescrLabel);
             this.searchModeGroupBox.Controls.Add(this.detectLacCheckBox);
             this.searchModeGroupBox.Controls.Add(this.StartButton);
@@ -140,6 +142,17 @@ namespace YandexCellInfoWF
             this.searchModeGroupBox.TabStop = false;
             this.searchModeGroupBox.Text = "3. Режим поиска и подробные настройки";
             this.searchModeGroupBox.Enter += new System.EventHandler(this.groupBox1_Enter);
+            // 
+            // fileToKmlButton
+            // 
+            this.fileToKmlButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.fileToKmlButton.Location = new System.Drawing.Point(392, 154);
+            this.fileToKmlButton.Name = "fileToKmlButton";
+            this.fileToKmlButton.Size = new System.Drawing.Size(100, 20);
+            this.fileToKmlButton.TabIndex = 28;
+            this.fileToKmlButton.Text = "KML из файла...";
+            this.fileToKmlButton.UseVisualStyleBackColor = true;
+            this.fileToKmlButton.Click += new System.EventHandler(this.fileToKmlButton_Click);
             // 
             // dontSaveFileCheckBox
             // 
@@ -161,6 +174,20 @@ namespace YandexCellInfoWF
             this.detailedSearchDescrLabel.Text = "Подробная информация о БС: существующие\r\nна ней сектора и информация о них: номер" +
     ",\r\nLAC, местоположение сектора.\r\n\r\nРезультат: список БС c секторами и LAC.";
             // 
+            // sendDataCheckBox
+            // 
+            this.sendDataCheckBox.AutoSize = true;
+            this.sendDataCheckBox.Checked = true;
+            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
+            this.sendDataCheckBox.Location = new System.Drawing.Point(133, 61);
+            this.sendDataCheckBox.Name = "sendDataCheckBox";
+            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
+            this.sendDataCheckBox.TabIndex = 24;
+            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
+    "БС)\r\n";
+            this.sendDataCheckBox.UseVisualStyleBackColor = true;
+            this.sendDataCheckBox.Visible = false;
+            // 
             // allSearrchDescrLabel
             // 
             this.allSearrchDescrLabel.AutoSize = true;
@@ -180,7 +207,6 @@ namespace YandexCellInfoWF
             this.detectLacCheckBox.TabIndex = 9;
             this.detectLacCheckBox.Text = "Определять LAC сектора (ниже скорость)";
             this.detectLacCheckBox.UseVisualStyleBackColor = true;
-            this.detectLacCheckBox.CheckedChanged += new System.EventHandler(this.saveManyFilesCheckBox_CheckedChanged);
             // 
             // StartButton
             // 
@@ -212,20 +238,6 @@ namespace YandexCellInfoWF
             this.sectorsLabel.TabIndex = 0;
             this.sectorsLabel.Text = "Сектора:";
             // 
-            // sendDataCheckBox
-            // 
-            this.sendDataCheckBox.AutoSize = true;
-            this.sendDataCheckBox.Checked = true;
-            this.sendDataCheckBox.CheckState = System.Windows.Forms.CheckState.Checked;
-            this.sendDataCheckBox.Location = new System.Drawing.Point(125, 362);
-            this.sendDataCheckBox.Name = "sendDataCheckBox";
-            this.sendDataCheckBox.Size = new System.Drawing.Size(266, 30);
-            this.sendDataCheckBox.TabIndex = 24;
-            this.sendDataCheckBox.Text = "Отправить результаты поиска разработчику\r\n(Помощь в составлении собственной базы " +
-    "БС)\r\n";
-            this.sendDataCheckBox.UseVisualStyleBackColor = true;
-            this.sendDataCheckBox.Visible = false;
-            // 
             // ConsoleGroupBox
             // 
             this.ConsoleGroupBox.Controls.Add(this.ConsoleTextBox);
@@ -249,7 +261,6 @@ namespace YandexCellInfoWF
             // 
             // generalSettingsGroupBox
             // 
-            this.generalSettingsGroupBox.Controls.Add(this.EnbDescrLinkLabel);
             this.generalSettingsGroupBox.Controls.Add(this.enbsTextBox);
             this.generalSettingsGroupBox.Controls.Add(this.LacTextBox);
             this.generalSettingsGroupBox.Controls.Add(this.enbsLabel);
@@ -266,38 +277,27 @@ namespace YandexCellInfoWF
             this.generalSettingsGroupBox.Text = "2. Общие настройки";
             this.generalSettingsGroupBox.Enter += new System.EventHandler(this.groupBox3_Enter);
             // 
-            // EnbDescrLinkLabel
-            // 
-            this.EnbDescrLinkLabel.AutoSize = true;
-            this.EnbDescrLinkLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.EnbDescrLinkLabel.Location = new System.Drawing.Point(4, 62);
-            this.EnbDescrLinkLabel.Name = "EnbDescrLinkLabel";
-            this.EnbDescrLinkLabel.Size = new System.Drawing.Size(98, 12);
-            this.EnbDescrLinkLabel.TabIndex = 13;
-            this.EnbDescrLinkLabel.TabStop = true;
-            this.EnbDescrLinkLabel.Text = "Диапазон или номера";
-            // 
             // enbsTextBox
             // 
             this.enbsTextBox.AccessibleDescription = "";
             this.enbsTextBox.AllowDrop = true;
-            this.enbsTextBox.Location = new System.Drawing.Point(102, 46);
+            this.enbsTextBox.Location = new System.Drawing.Point(93, 46);
             this.enbsTextBox.Name = "enbsTextBox";
-            this.enbsTextBox.Size = new System.Drawing.Size(400, 20);
+            this.enbsTextBox.Size = new System.Drawing.Size(409, 20);
             this.enbsTextBox.TabIndex = 5;
             // 
             // LacTextBox
             // 
             this.LacTextBox.AllowDrop = true;
-            this.LacTextBox.Location = new System.Drawing.Point(194, 17);
+            this.LacTextBox.Location = new System.Drawing.Point(169, 17);
             this.LacTextBox.Name = "LacTextBox";
-            this.LacTextBox.Size = new System.Drawing.Size(308, 20);
+            this.LacTextBox.Size = new System.Drawing.Size(333, 20);
             this.LacTextBox.TabIndex = 4;
             // 
             // enbsLabel
             // 
             this.enbsLabel.AutoSize = true;
-            this.enbsLabel.Location = new System.Drawing.Point(7, 49);
+            this.enbsLabel.Location = new System.Drawing.Point(4, 49);
             this.enbsLabel.Name = "enbsLabel";
             this.enbsLabel.Size = new System.Drawing.Size(89, 13);
             this.enbsLabel.TabIndex = 2;
@@ -306,7 +306,7 @@ namespace YandexCellInfoWF
             // MncTextBox
             // 
             this.MncTextBox.AllowDrop = true;
-            this.MncTextBox.Location = new System.Drawing.Point(120, 17);
+            this.MncTextBox.Location = new System.Drawing.Point(104, 17);
             this.MncTextBox.MaxLength = 3;
             this.MncTextBox.Name = "MncTextBox";
             this.MncTextBox.Size = new System.Drawing.Size(35, 20);
@@ -315,7 +315,7 @@ namespace YandexCellInfoWF
             // MccTextBox
             // 
             this.MccTextBox.AllowDrop = true;
-            this.MccTextBox.Location = new System.Drawing.Point(42, 17);
+            this.MccTextBox.Location = new System.Drawing.Point(35, 17);
             this.MccTextBox.MaxLength = 3;
             this.MccTextBox.Name = "MccTextBox";
             this.MccTextBox.Size = new System.Drawing.Size(35, 20);
@@ -325,7 +325,7 @@ namespace YandexCellInfoWF
             // MncLabel
             // 
             this.MncLabel.AutoSize = true;
-            this.MncLabel.Location = new System.Drawing.Point(83, 20);
+            this.MncLabel.Location = new System.Drawing.Point(71, 21);
             this.MncLabel.Name = "MncLabel";
             this.MncLabel.Size = new System.Drawing.Size(34, 13);
             this.MncLabel.TabIndex = 0;
@@ -334,7 +334,7 @@ namespace YandexCellInfoWF
             // LacLabel
             // 
             this.LacLabel.AutoSize = true;
-            this.LacLabel.Location = new System.Drawing.Point(161, 20);
+            this.LacLabel.Location = new System.Drawing.Point(140, 20);
             this.LacLabel.Name = "LacLabel";
             this.LacLabel.Size = new System.Drawing.Size(30, 13);
             this.LacLabel.TabIndex = 0;
@@ -343,7 +343,7 @@ namespace YandexCellInfoWF
             // MccLabel
             // 
             this.MccLabel.AutoSize = true;
-            this.MccLabel.Location = new System.Drawing.Point(6, 20);
+            this.MccLabel.Location = new System.Drawing.Point(4, 21);
             this.MccLabel.Name = "MccLabel";
             this.MccLabel.Size = new System.Drawing.Size(33, 13);
             this.MccLabel.TabIndex = 0;
@@ -381,7 +381,7 @@ namespace YandexCellInfoWF
             // 
             this.currentEnbTextLabel.AutoSize = true;
             this.currentEnbTextLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.currentEnbTextLabel.Location = new System.Drawing.Point(3, 380);
+            this.currentEnbTextLabel.Location = new System.Drawing.Point(5, 380);
             this.currentEnbTextLabel.Name = "currentEnbTextLabel";
             this.currentEnbTextLabel.Size = new System.Drawing.Size(63, 12);
             this.currentEnbTextLabel.TabIndex = 16;
@@ -391,32 +391,64 @@ namespace YandexCellInfoWF
             // 
             this.currentEnbLabel.AutoSize = true;
             this.currentEnbLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.currentEnbLabel.Location = new System.Drawing.Point(72, 380);
+            this.currentEnbLabel.Location = new System.Drawing.Point(69, 380);
             this.currentEnbLabel.Name = "currentEnbLabel";
             this.currentEnbLabel.Size = new System.Drawing.Size(10, 12);
             this.currentEnbLabel.TabIndex = 17;
             this.currentEnbLabel.Text = "0";
             // 
-            // fileToKmlButton
+            // TotalFoundLabel
             // 
-            this.fileToKmlButton.Font = new System.Drawing.Font("Microsoft Sans Serif", 7F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
-            this.fileToKmlButton.Location = new System.Drawing.Point(392, 154);
-            this.fileToKmlButton.Name = "fileToKmlButton";
-            this.fileToKmlButton.Size = new System.Drawing.Size(100, 20);
-            this.fileToKmlButton.TabIndex = 28;
-            this.fileToKmlButton.Text = "KML из файла...";
-            this.fileToKmlButton.UseVisualStyleBackColor = true;
-            this.fileToKmlButton.Click += new System.EventHandler(this.fileToKmlButton_Click);
+            this.TotalFoundLabel.AutoSize = true;
+            this.TotalFoundLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.TotalFoundLabel.Location = new System.Drawing.Point(403, 380);
+            this.TotalFoundLabel.Name = "TotalFoundLabel";
+            this.TotalFoundLabel.Size = new System.Drawing.Size(45, 12);
+            this.TotalFoundLabel.TabIndex = 25;
+            this.TotalFoundLabel.Text = "Найдено:";
+            // 
+            // TotalFoundCounter
+            // 
+            this.TotalFoundCounter.AutoSize = true;
+            this.TotalFoundCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.TotalFoundCounter.Location = new System.Drawing.Point(448, 380);
+            this.TotalFoundCounter.Name = "TotalFoundCounter";
+            this.TotalFoundCounter.Size = new System.Drawing.Size(10, 12);
+            this.TotalFoundCounter.TabIndex = 29;
+            this.TotalFoundCounter.Text = "0";
+            // 
+            // RequsetsTodayLabel
+            // 
+            this.RequsetsTodayLabel.AutoSize = true;
+            this.RequsetsTodayLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.RequsetsTodayLabel.Location = new System.Drawing.Point(289, 380);
+            this.RequsetsTodayLabel.Name = "RequsetsTodayLabel";
+            this.RequsetsTodayLabel.Size = new System.Drawing.Size(83, 12);
+            this.RequsetsTodayLabel.TabIndex = 30;
+            this.RequsetsTodayLabel.Text = "Запросов за день:";
+            // 
+            // RequsetsTodayCounter
+            // 
+            this.RequsetsTodayCounter.AutoSize = true;
+            this.RequsetsTodayCounter.Font = new System.Drawing.Font("Microsoft Sans Serif", 6.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.RequsetsTodayCounter.Location = new System.Drawing.Point(371, 380);
+            this.RequsetsTodayCounter.Name = "RequsetsTodayCounter";
+            this.RequsetsTodayCounter.Size = new System.Drawing.Size(10, 12);
+            this.RequsetsTodayCounter.TabIndex = 31;
+            this.RequsetsTodayCounter.Text = "0";
             // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(723, 396);
+            this.Controls.Add(this.RequsetsTodayCounter);
+            this.Controls.Add(this.RequsetsTodayLabel);
+            this.Controls.Add(this.TotalFoundCounter);
+            this.Controls.Add(this.TotalFoundLabel);
             this.Controls.Add(this.currentEnbLabel);
             this.Controls.Add(this.currentEnbTextLabel);
             this.Controls.Add(this.progressLabel);
-            this.Controls.Add(this.sendDataCheckBox);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.statusStrip1);
             this.Controls.Add(this.generalSettingsGroupBox);
@@ -428,7 +460,7 @@ namespace YandexCellInfoWF
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "YandexCellInfo by Bastel2020 (v1.1)";
+            this.Text = "YandexCellInfo by Bastel2020 (v1.2)";
             this.searchModeGroupBox.ResumeLayout(false);
             this.searchModeGroupBox.PerformLayout();
             this.ConsoleGroupBox.ResumeLayout(false);
@@ -465,7 +497,6 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.TextBox enbsTextBox;
         private System.Windows.Forms.Label enbsLabel;
         private System.Windows.Forms.CheckBox detectLacCheckBox;
-        private System.Windows.Forms.LinkLabel EnbDescrLinkLabel;
         private System.Windows.Forms.Label detailedSearchDescrLabel;
         private System.Windows.Forms.Label allSearrchDescrLabel;
         private System.Windows.Forms.CheckBox sendDataCheckBox;
@@ -474,6 +505,10 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.Label currentEnbLabel;
         private System.Windows.Forms.CheckBox dontSaveFileCheckBox;
         private System.Windows.Forms.Button fileToKmlButton;
+        private System.Windows.Forms.Label TotalFoundLabel;
+        private System.Windows.Forms.Label TotalFoundCounter;
+        private System.Windows.Forms.Label RequsetsTodayLabel;
+        private System.Windows.Forms.Label RequsetsTodayCounter;
     }
 }
 

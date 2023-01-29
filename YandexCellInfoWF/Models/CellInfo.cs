@@ -49,5 +49,10 @@ namespace YandexCellInfoWF.Models
             SignalStrength = signalStrength;
             AgeInfo = ageInfo;
         }
+
+        public override string ToString()
+        {
+            return $"{MCC}{MNC} ENB: {EnbNumber} : {Sector} LAC: {LAC}";
+        }
     }
 }

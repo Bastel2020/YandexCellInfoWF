@@ -8,6 +8,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Service;
 using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF
@@ -18,7 +19,15 @@ namespace YandexCellInfoWF
         {
             InitializeComponent();
 
-            Service.SettingsLoaderService.ChangeInterface(TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
+            Service.SettingsLoaderService.LoadSettings(TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
+            Service.SettingsLoaderService.LoadTodayRequsets(RequsetsTodayCounter);
+
+            FormClosing += Form1_FormClosing;
+        }
+
+        private void Form1_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            SettingsLoaderService.SaveTodayRequsets(int.Parse(RequsetsTodayCounter.Text));
         }
 
         private void label1_Click(object sender, System.EventArgs e)
@@ -70,7 +79,15 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text, dontSaveFileCheckBox);
+                    var abortScan = false;
+                    if (int.Parse(RequsetsTodayCounter.Text) >= SettingsLoaderService.GetRequsetsLimit())
+                    {
+                        var result = MessageBox.Show("Превышен лимит запросов! Закругляемся?", "Яндексу ты не нравишься", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.Yes)
+                            abortScan = true;
+                    }
+                    if (!abortScan)
+                        await Workers.ManyInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TotalFoundCounter, RequsetsTodayCounter, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, sectorsTextBox.Text, dontSaveFileCheckBox);
                     ResetInterface();
                 }
             }
@@ -83,10 +100,18 @@ namespace YandexCellInfoWF
                 else
                 {
                     StartButton.Text = "Остановить сканирование";
-                    await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked, dontSaveFileCheckBox);
+                    var abortScan = false;
+                    if (int.Parse(RequsetsTodayCounter.Text) >= SettingsLoaderService.GetRequsetsLimit())
+                    {
+                        var result = MessageBox.Show("Превышен лимит запросов! Закругляемся?", "Яндексу ты не нравишься", MessageBoxButtons.YesNo);
+                        if (result == DialogResult.Yes)
+                            abortScan = true;
+                    }
+                    if (!abortScan)
+                        await Workers.DetailedInfoWorker.SearchEnbs(ConsoleTextBox, progressBar1, currentEnbLabel, TotalFoundCounter, RequsetsTodayCounter, TokenTextBox.Text, MccTextBox.Text, MncTextBox.Text, enbsTextBox.Text, LacTextBox.Text, detectLacCheckBox.Checked, dontSaveFileCheckBox);
                     ResetInterface();
                 }
-
+            Service.SettingsLoaderService.SaveTodayRequsets(int.Parse(RequsetsTodayCounter.Text));
         }
 
         private void allSearchRadioButton_CheckedChanged(object sender, System.EventArgs e)
@@ -194,8 +219,8 @@ namespace YandexCellInfoWF
                     })
                     .Select(obj =>
                     {
-                        if (obj is List<EnbFullInfo>)
-                            return KmlService.GetKML((List<EnbFullInfo>)obj);
+                        if (obj is List<EnbFullInfo> list)
+                            return KmlService.GetKML(list);
                         else
                             return KmlService.GetKML((List<BaseItemInfo>)obj);
                     });

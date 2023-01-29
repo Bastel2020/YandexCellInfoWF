@@ -102,6 +102,7 @@
     <Compile Include="Models\OutputData.cs" />
     <Compile Include="Models\Settings\DefaultFields.cs" />
     <Compile Include="Models\Settings\PreloadSectors.cs" />
+    <Compile Include="Models\Settings\RequsetsCountInfo.cs" />
     <Compile Include="Models\Settings\SettingsBase.cs" />
     <Compile Include="Models\YandexRequest.cs" />
     <Compile Include="Models\YandexRequestCommonInfo.cs" />
