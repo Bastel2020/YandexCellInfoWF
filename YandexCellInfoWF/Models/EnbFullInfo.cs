@@ -60,5 +60,11 @@ namespace YandexCellInfoWF.Models
             else
                 Precision = Math.Min(Precision, sector.Precision);
         }
+        public override int GetHashCode()
+        {
+            var sectorsHash = string.Join("",Sectors?.Select(s => s.GetHashCode().ToString()));
+            var str = $"{Longitude};{Latitude};{Precision};{Enb};{sectorsHash.GetHashCode()}";
+            return str.GetHashCode();
+        }
     }
 }

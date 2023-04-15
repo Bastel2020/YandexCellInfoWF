@@ -5,7 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace YandexCellInfoWF.Models
+namespace YandexCellInfoWF.Models.Yandex
 {
     public class YandexRequest
     {

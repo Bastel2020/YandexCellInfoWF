@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using YandexCellInfoWF.Models.Yandex;
 
 namespace YandexCellInfoWF.Models
 {
@@ -35,6 +36,12 @@ namespace YandexCellInfoWF.Models
                 return false;
             var secondObj = obj as BaseItemInfo;
             return Number == secondObj.Number && Latitude == secondObj.Latitude && Longitude == secondObj.Longitude && Precision == secondObj.Precision;
+        }
+
+        public override int GetHashCode()
+        {
+            var str = $"{Longitude};{Latitude};{Precision};{Number};{lac}";
+            return str.GetHashCode();
         }
     }
 }

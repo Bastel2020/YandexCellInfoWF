@@ -15,7 +15,7 @@ namespace YandexCellInfoWF.Service
         private static SettingsBase Settings { get; set; }
         private static RequsetsCountInfo ToadayRequsetsInfo { get; set; }
 
-        public static SettingsBase LoadSettings()
+        public static SettingsBase LoadDefaultFileSettings()
         {
             try
             {
@@ -80,10 +80,8 @@ namespace YandexCellInfoWF.Service
             catch { return false; }
         }
 
-        public static bool LoadSettings(TextBox tokenBox, TextBox mccBox, TextBox mncBox, TextBox lacsBox, TextBox enbsBox, TextBox sectorsBox)
+        public static bool LoadSettings(SettingsBase settings, TextBox tokenBox, TextBox mccBox, TextBox mncBox, TextBox lacsBox, TextBox enbsBox, TextBox sectorsBox)
         {
-            var settings = LoadSettings();
-
             if (settings == null)
                 return false;
 

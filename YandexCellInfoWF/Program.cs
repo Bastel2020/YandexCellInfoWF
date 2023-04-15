@@ -11,16 +11,18 @@ namespace YandexCellInfoWF
         /// <summary>
         /// Главная точка входа для приложения.
         /// </summary>
+        public static Form1 MainForm { get; set; }
         [STAThread]
+
         static void Main()
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
 
-            var form = new Form1();
-            FormChanger.LoadForm(form);
+            MainForm = new Form1();
+            FormChanger.LoadForm(MainForm);
 
-            Application.Run(form);
+            Application.Run(MainForm);
         }
     }
 }

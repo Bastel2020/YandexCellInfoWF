@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Schema;
 
-namespace YandexCellInfoWF.Models
+namespace YandexCellInfoWF.Models.Yandex
 {
     public class YandexRequestCommonInfo
     {

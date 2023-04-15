@@ -6,14 +6,8 @@ using System.Threading.Tasks;
 
 namespace YandexCellInfoWF.Models
 {
-    public class DetailedInfoResults
+    public class DetailedInfoResults : ResultsModel<EnbFullInfo>
     {
-        public IEnumerable<EnbFullInfo> Enbs { get; set; }
-        public string MCC { get; set; }
-        public string MNC { get; set; }
-        public string SearchRange { get; set; }
-        public string LACs { get; set; }
-        public DateTime SearchDate { get; set; }
         public IEnumerable<string> SectorsCount
         {
             get
@@ -30,14 +24,9 @@ namespace YandexCellInfoWF.Models
             }
         }
 
-        public DetailedInfoResults(string MCC, string MNC, string enbRange, string LACsRange, IEnumerable<EnbFullInfo> enbs)
+        public DetailedInfoResults(string MCC, string MNC, string enbRange, string LACsRange, IEnumerable<EnbFullInfo> enbs) : base(MCC, MNC, enbRange, LACsRange, enbs)
         {
-            Enbs = enbs;
-            this.MCC = MCC;
-            this.MNC = MNC;
-            SearchRange = enbRange;
-            LACs = LACsRange;
-            SearchDate = DateTime.Now;
+
         }
     }
 }

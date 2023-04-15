@@ -3,6 +3,7 @@ using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
 using System.Globalization;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -10,6 +11,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Models.Yandex;
 using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF.Workers
@@ -39,9 +41,10 @@ namespace YandexCellInfoWF.Workers
             var results = new List<BaseItemInfo>();
             var successCounter = 0;
 
-            if (!InputParser.ParseInputWithSector(new InputData(mccString, mncString, enbsString, lacsString, sectorsString), out parsedData))
+            var parseResult = InputParser.ParseInputWithSector(new InputData(mccString, mncString, enbsString, lacsString, sectorsString), out parsedData);
+            if (!parseResult.Success)
             {
-                console.AppendText("\r\nОшибка в входных данных. Завершение работы алгоритма.");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных ({parseResult.Message}). Завершение работы алгоритма.");
                 return false;
             }
 
@@ -115,21 +118,24 @@ namespace YandexCellInfoWF.Workers
             }
             if (results.Count == 0)
             {
-                console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - нет найденых.");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Поиск сот окончен - нет найденых.");
                 return true;
             }
             if (dontSaveFiles.Checked)
             {
-                console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен. Найдено: {results.Count}");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Поиск сот окончен. Найдено: {results.Count}");
                 return true;
             }
-            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(results, Formatting.Indented));
-            System.IO.File.WriteAllText(path: Environment.CurrentDirectory + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
+            var dir = Environment.CurrentDirectory + $"\\{mccString}-{mncString}";
+            Directory.CreateDirectory(dir);
+            var preparedResults = new ResultsModel<BaseItemInfo>(mccString, mncString, enbsString, lacsString, results);
+            File.WriteAllText(dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbAllInfo.txt", JsonConvert.SerializeObject(preparedResults, Formatting.Indented));
+            File.WriteAllText(path: dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(results.Select(r => r.Number), Formatting.Indented));
 
             var kml = await KmlService.GetKMLAsync(results);
-            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} map.kml", kml);
+            File.WriteAllText(dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} map.kml", kml);
 
-            console.AppendText($"\n\t[{DateTime.Now:T}] Поиск сот окончен - найдено: {results.Count}. Результаты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
+            console.AppendText($"\r\n[{DateTime.Now:T}] Поиск сот окончен - найдено: {results.Count}. Результаты помещены в файлы EnbAllInfo.txt и EnbNums.txt.");
 
             return true;
         }

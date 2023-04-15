@@ -29,6 +29,7 @@ namespace YandexCellInfoWF
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
             this.TokenLabel = new System.Windows.Forms.Label();
             this.TokenTextBox = new System.Windows.Forms.TextBox();
             this.GetTokenLinkLabel = new System.Windows.Forms.LinkLabel();
@@ -44,6 +45,7 @@ namespace YandexCellInfoWF
             this.StartButton = new System.Windows.Forms.Button();
             this.sectorsTextBox = new System.Windows.Forms.TextBox();
             this.sectorsLabel = new System.Windows.Forms.Label();
+            this.DragnDropMsgLabel = new System.Windows.Forms.Label();
             this.ConsoleGroupBox = new System.Windows.Forms.GroupBox();
             this.ConsoleTextBox = new System.Windows.Forms.TextBox();
             this.generalSettingsGroupBox = new System.Windows.Forms.GroupBox();
@@ -237,6 +239,25 @@ namespace YandexCellInfoWF
             this.sectorsLabel.Size = new System.Drawing.Size(52, 13);
             this.sectorsLabel.TabIndex = 0;
             this.sectorsLabel.Text = "Сектора:";
+            // 
+            // DragnDropMsgLabel
+            // 
+            this.DragnDropMsgLabel.AllowDrop = true;
+            this.DragnDropMsgLabel.BackColor = System.Drawing.SystemColors.ActiveCaption;
+            this.DragnDropMsgLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 21.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(204)));
+            this.DragnDropMsgLabel.ForeColor = System.Drawing.SystemColors.ControlText;
+            this.DragnDropMsgLabel.Location = new System.Drawing.Point(1, 2);
+            this.DragnDropMsgLabel.Name = "DragnDropMsgLabel";
+            this.DragnDropMsgLabel.Size = new System.Drawing.Size(720, 390);
+            this.DragnDropMsgLabel.TabIndex = 32;
+            this.DragnDropMsgLabel.Text = "Перетащите сюда файл конфигурации,\r\nчтобы загрузить его настройки";
+            this.DragnDropMsgLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
+            this.DragnDropMsgLabel.Visible = false;
+            this.DragnDropMsgLabel.DragDrop += new System.Windows.Forms.DragEventHandler(this.DragnDropMsgLabel_DragLeave);
+            this.DragnDropMsgLabel.DragEnter += new System.Windows.Forms.DragEventHandler(this.DragnDropMsgLabel_DragEnter);
+            this.DragnDropMsgLabel.DragLeave += new System.EventHandler(this.Form1_DragLeave);
+            this.DragnDropMsgLabel.GiveFeedback += new System.Windows.Forms.GiveFeedbackEventHandler(this.DragnDropMsgLabel_GiveFeedback);
+            this.DragnDropMsgLabel.QueryContinueDrag += new System.Windows.Forms.QueryContinueDragEventHandler(this.DragnDropMsgLabel_QueryContinueDrag);
             // 
             // ConsoleGroupBox
             // 
@@ -439,9 +460,11 @@ namespace YandexCellInfoWF
             // 
             // Form1
             // 
+            this.AllowDrop = true;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(723, 396);
+            this.Controls.Add(this.DragnDropMsgLabel);
             this.Controls.Add(this.RequsetsTodayCounter);
             this.Controls.Add(this.RequsetsTodayLabel);
             this.Controls.Add(this.TotalFoundCounter);
@@ -458,9 +481,11 @@ namespace YandexCellInfoWF
             this.Controls.Add(this.TokenTextBox);
             this.Controls.Add(this.TokenLabel);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedDialog;
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "YandexCellInfo by Bastel2020 (v1.2)";
+            this.Text = "YandexCellInfo by Bastel2020 (v1.2) ";
+            this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.searchModeGroupBox.ResumeLayout(false);
             this.searchModeGroupBox.PerformLayout();
             this.ConsoleGroupBox.ResumeLayout(false);
@@ -509,6 +534,7 @@ namespace YandexCellInfoWF
         private System.Windows.Forms.Label TotalFoundCounter;
         private System.Windows.Forms.Label RequsetsTodayLabel;
         private System.Windows.Forms.Label RequsetsTodayCounter;
+        private System.Windows.Forms.Label DragnDropMsgLabel;
     }
 }
 

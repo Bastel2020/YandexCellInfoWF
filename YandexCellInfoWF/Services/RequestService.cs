@@ -11,6 +11,8 @@ using System.Windows.Forms;
 using System.Threading;
 using System.Diagnostics;
 using YandexCellInfoWF.Service;
+using YandexCellInfoWF.Models.Yandex;
+using Microsoft.CSharp.RuntimeBinder;
 
 namespace YandexCellInfoWF.Services
 {
@@ -19,9 +21,9 @@ namespace YandexCellInfoWF.Services
         private static HttpClient client = new HttpClient();
         private static int requsetsCounter = 0;
 
-        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, Label requsetsTodayCount, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, bool repeated = false)
+        public static async Task<BaseItemInfo> MakeRequest(TextBox console, YandexRequestCommonInfo commonInfo, Label requsetsTodayCount, List<CellInfo> cells, CancellationToken ct, int sectorNum = -1, int repeatsCount = 0)
         {
-            requsetsCounter = int.Parse(requsetsTodayCount.Text);
+            int.TryParse(requsetsTodayCount.Text, out requsetsCounter);
             if (requsetsCounter == SettingsLoaderService.GetRequsetsLimit())
             {
                 var result = MessageBox.Show("Превышен лимит запросов! Закругляемся?", "Яндексу ты не нравишься", MessageBoxButtons.YesNo);
@@ -68,18 +70,43 @@ namespace YandexCellInfoWF.Services
                 {
                     return null;
                 }
-                catch (Exception e)
+
+                catch(RuntimeBinderException e)
                 {
-                    if (repeated)
+                    if (repeatsCount >= 5)
                     {
-                        //console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Пропуск БС.");
+                        if (Program.MainForm.InvokeRequired && !Program.MainForm.IsDisposed && !console.IsDisposed)
+                            Program.MainForm.Invoke(new Action(() => { console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка. Возможно, введён некорректный токен. Пропуск БС."); }));
                         return result;
                     }
-                    //console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {e.Message} Повтор.");
-                    return await MakeRequest(console, commonInfo, requsetsTodayCount, cells, ct, sectorNum, true);
+                    if (Program.MainForm.InvokeRequired && !Program.MainForm.IsDisposed && !console.IsDisposed)
+                        Program.MainForm.Invoke(new Action(() => { console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка. Возможно, введён некорректный токен. Повтор."); }));
+                    return await MakeRequest(console, commonInfo, requsetsTodayCount, cells, ct, sectorNum, repeatsCount + 1);
+                }
+                
+                catch (Exception e)
+                {
+                    var errorMsg = e.Message;
+                    if (e.InnerException != null)
+                        errorMsg += $" {e.InnerException.Message}";
+                    if (repeatsCount >= 5)
+                    {
+                        if (Program.MainForm.InvokeRequired && !Program.MainForm.IsDisposed && !console.IsDisposed)
+                            Program.MainForm.Invoke(new Action(() => { console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {errorMsg} Пропуск БС."); }));
+                        return result;
+                    }
+                    if (Program.MainForm.InvokeRequired && !Program.MainForm.IsDisposed && !console.IsDisposed)
+                        Program.MainForm.Invoke(new Action(() => { console.AppendText($"\r\n[{DateTime.Now:T}] Произошла ошибка {errorMsg} Повтор.");  }));
+                    return await MakeRequest(console, commonInfo, requsetsTodayCount, cells, ct, sectorNum, repeatsCount + 1);
                 }
             });
-            try { requsetsTodayCount.Text = requsetsCounter.ToString(); } catch { }
+            if (!Program.MainForm.IsDisposed && !requsetsTodayCount.IsDisposed)
+            {
+                if (Program.MainForm.InvokeRequired)
+                    Program.MainForm.Invoke(new Action(() => { requsetsTodayCount.Text = requsetsCounter.ToString(); }));
+                else
+                    requsetsTodayCount.Text = requsetsCounter.ToString();
+            }
             return taskResult;
         }
     }

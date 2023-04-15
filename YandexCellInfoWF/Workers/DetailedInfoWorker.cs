@@ -2,6 +2,7 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
 using System.Net.Http;
 using System.Text;
@@ -9,6 +10,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using YandexCellInfoWF.Models;
+using YandexCellInfoWF.Models.Yandex;
 using YandexCellInfoWF.Services;
 
 namespace YandexCellInfoWF.Workers
@@ -17,8 +19,6 @@ namespace YandexCellInfoWF.Workers
     {
         private static CancellationTokenSource ctSource;
         private static CancellationToken ct;
-
-        private static HttpClient client = new HttpClient();
 
         private static List<int> commonSectors;
         private static List<int> allSectors = Enumerable.Range(0, 256).ToList();
@@ -44,8 +44,11 @@ namespace YandexCellInfoWF.Workers
             }
             var preparedResults = new DetailedInfoResults(mccString, mncString, enbsString, lacsString, result);
 
-            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} map.kml", await KmlService.GetKMLAsync(preparedResults.Enbs));
-            System.IO.File.WriteAllText(Environment.CurrentDirectory + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(preparedResults, Formatting.Indented));
+            var dir = Environment.CurrentDirectory + $"\\{mccString}-{mncString}";
+            Directory.CreateDirectory(dir);
+            File.WriteAllText(dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} map.kml", await KmlService.GetKMLAsync(preparedResults.Enbs));
+            File.WriteAllText(dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbDetailedInfo.txt", JsonConvert.SerializeObject(preparedResults, Formatting.Indented));
+            File.WriteAllText(dir + "\\" + $"{DateTime.Now:ddMMyy-hhmmss} {mccString}-{mncString} EnbNums.txt", JsonConvert.SerializeObject(preparedResults.Enbs.Select(e => e.Enb), Formatting.Indented));
             console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен, найдено БС: {result.Count}. Секторов: {result.SelectMany(r => r.Sectors).Count()} Результаты сохранены в файл EnbDetailedInfo.txt.");
             return true;
         }
@@ -60,10 +63,10 @@ namespace YandexCellInfoWF.Workers
             var results = new List<EnbFullInfo>();
             var successCounter = 0;
 
-
-            if (!InputParser.ParseInputWithoutSector(new InputData(mccString, mncString, enbsString, lacsString), out parsedData))
+            var parseResult = InputParser.ParseInputWithoutSector(new InputData(mccString, mncString, enbsString, lacsString), out parsedData);
+            if (!parseResult.Success)
             {
-                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных. Проверьте входные данные.");
+                console.AppendText($"\r\n[{DateTime.Now:T}] Ошибка в входных данных ({parseResult.Message}). Завершение работы алгоритма.");
                 return null;
             }
 

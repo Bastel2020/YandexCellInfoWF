@@ -2,8 +2,10 @@
 using Newtonsoft.Json.Linq;
 using System;
 using System.Collections.Generic;
+using System.Configuration;
 using System.Diagnostics;
 using System.Drawing;
+using System.IO;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -15,12 +17,13 @@ namespace YandexCellInfoWF
 {
     public partial class Form1 : Form
     {
+        private static DateTime dragndropAntispamTimestamp = DateTime.Now;
         public Form1()
         {
             InitializeComponent();
-
-            Service.SettingsLoaderService.LoadSettings(TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
-            Service.SettingsLoaderService.LoadTodayRequsets(RequsetsTodayCounter);
+            var settings = SettingsLoaderService.LoadDefaultFileSettings();
+            SettingsLoaderService.LoadSettings(settings, TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
+            SettingsLoaderService.LoadTodayRequsets(RequsetsTodayCounter);
 
             FormClosing += Form1_FormClosing;
         }
@@ -236,6 +239,76 @@ namespace YandexCellInfoWF
             {
                 MessageBox.Show($"Произошла ошибка! Проверьте, что на вход переданы файлы DeailedInfo или AllInfo. \r\nОшибка: {ex.Message}.", "Ошибка при обработке файлов");
             }
+        }
+
+        private void Form1_DragEnter(object sender, DragEventArgs e)
+        {
+            if (DateTime.Now - dragndropAntispamTimestamp > TimeSpan.FromMilliseconds(200))
+            {
+                DragnDropMsgLabel.Enabled = true;
+                DragnDropMsgLabel.Visible = true;
+            }
+        }
+
+        private void Form1_DragLeave(object sender, EventArgs e)
+        {
+            DragnDropMsgLabel.Enabled = false;
+            DragnDropMsgLabel.Visible = false;
+            dragndropAntispamTimestamp = DateTime.Now;
+        }
+
+        private void DragnDropMsgLabel_DragLeave(object sender, DragEventArgs e)
+        {
+            DragnDropMsgLabel.Enabled = false;
+            DragnDropMsgLabel.Visible = false;
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+            {
+                List<string> files = new List<string>();
+                try
+                {
+                    files.AddRange((string[])e.Data.GetData(DataFormats.FileDrop, false));
+                    if (files.Count == 1)
+                    {
+                        var settings = JsonConvert.DeserializeObject<Models.Settings.SettingsBase>(File.ReadAllText(files[0]));
+                        SettingsLoaderService.LoadSettings(settings, TokenTextBox, MccTextBox, MncTextBox, LacTextBox, enbsTextBox, sectorsTextBox);
+
+                        if (!string.IsNullOrEmpty(ConsoleTextBox.Text))
+                            ConsoleTextBox.AppendText($"\r\n");
+                        ConsoleTextBox.AppendText($"[{DateTime.Now:T}] Загружен файл конфигурации ({files[0]})");
+                    }
+                    else
+                    {
+                        if (!string.IsNullOrEmpty(ConsoleTextBox.Text))
+                            ConsoleTextBox.AppendText($"\r\n");
+                        ConsoleTextBox.AppendText($"[{DateTime.Now:T}] Не удалось загрузить файл конфигурации: передано несколько файлов");
+                    }
+                }
+                catch(Exception ex)
+                {
+                    if (!string.IsNullOrEmpty(ConsoleTextBox.Text))
+                        ConsoleTextBox.AppendText($"\r\n");
+                    var filename = files.Count > 0 ? files[0] : "файл не загружен";
+                    ConsoleTextBox.AppendText($"[{DateTime.Now:T}] Не удалось загрузить файл конфигурации ({filename})");
+                }
+            }
+        }
+
+        private void DragnDropMsgLabel_GiveFeedback(object sender, GiveFeedbackEventArgs e)
+        {
+            DragnDropMsgLabel.Enabled = false;
+            DragnDropMsgLabel.Visible = false;
+        }
+
+        private void DragnDropMsgLabel_QueryContinueDrag(object sender, QueryContinueDragEventArgs e)
+        {
+            DragnDropMsgLabel.Enabled = false;
+            DragnDropMsgLabel.Visible = false;
+        }
+
+        private void DragnDropMsgLabel_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop, false))
+                e.Effect = DragDropEffects.All;
         }
     }
 }
