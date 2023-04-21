@@ -484,7 +484,7 @@ namespace YandexCellInfoWF
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "Form1";
-            this.Text = "YandexCellInfo by Bastel2020 (v1.2) ";
+            this.Text = "YandexCellInfo by Bastel2020 (v1.3 Alpha) ";
             this.DragEnter += new System.Windows.Forms.DragEventHandler(this.Form1_DragEnter);
             this.searchModeGroupBox.ResumeLayout(false);
             this.searchModeGroupBox.PerformLayout();
