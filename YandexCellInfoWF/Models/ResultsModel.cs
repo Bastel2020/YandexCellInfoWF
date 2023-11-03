@@ -14,15 +14,17 @@ namespace YandexCellInfoWF.Models
         public string SearchRange { get; set; }
         public string LACs { get; set; }
         public DateTime SearchDateUtc { get; set; }
+        public string SectorsRange { get; set; }
         public int ResultHash { get; set; }
 
-        public ResultsModel(string MCC, string MNC, string enbRange, string LACsRange, IEnumerable<TInput> enbs)
+        public ResultsModel(string MCC, string MNC, string enbRange, string LACsRange, string sectorsRange, IEnumerable<TInput> enbs)
         {
             Enbs = enbs;
             this.MCC = MCC;
             this.MNC = MNC;
             SearchRange = enbRange;
             LACs = LACsRange;
+            SectorsRange = sectorsRange;
             SearchDateUtc = DateTime.UtcNow;
             ResultHash = GetHashCode();
         }
@@ -30,7 +32,7 @@ namespace YandexCellInfoWF.Models
         public override int GetHashCode()
         {
             var enbsHash = string.Join("", Enbs.Select(v => v.GetHashCode())).GetHashCode();
-            return $"{enbsHash};{MCC};{MNC};{SearchRange};{LACs};{SearchDateUtc}".GetHashCode();
+            return $"{enbsHash};{MCC};{MNC};{SearchRange};{LACs};{SectorsRange};{SearchDateUtc}".GetHashCode();
         }
     }
 }

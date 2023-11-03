@@ -86,6 +86,32 @@ namespace YandexCellInfoWF.Workers
             return (true, "");
         }
 
+        public static ICollection<int> ParseStringInput(string input)
+        {
+            var results = new List<int>();
+            try
+            {
+                var rangedNums = new List<int>();
+                results = input
+                    .Split(new[] { ',', ' ', '\n', '\t', '\r', ';', ':', '.' }, StringSplitOptions.RemoveEmptyEntries)
+                    .Select(ParseRange(rangedNums))
+                    .ToList();
+                results.AddRange(rangedNums);
+
+                results = results
+                    .Distinct()
+                    .OrderBy(v => v)
+                    .ToList();
+            }
+            catch (Exception e)
+            {
+                return null;
+            }
+
+
+            return results;
+        }
+
         private static Func<string, int> ParseRange(List<int> sectorsToAdd)
         {
             return input =>
@@ -103,15 +129,6 @@ namespace YandexCellInfoWF.Workers
                     var valToAdd = Enumerable.Range(0, (int)Math.Pow(10, positions.Count))
                     .Select(v => v.ToString().PadLeft(positions.Count))
                     .ToList();
-                    //for (int i = 1; i < 10; i++)
-                    //{
-                    //    for (int k = 1; k < positions.Count; k++)
-                    //    {
-                    //        var strToAdd = "".PadLeft(positions.Count, '0').ToArray();
-                    //        strToAdd[k] = char.Parse(i.ToString());
-                    //        valToAdd.Add(string.Join("", strToAdd));
-                    //    }
-                    //}
 
                     foreach (var val in valToAdd)
                     {

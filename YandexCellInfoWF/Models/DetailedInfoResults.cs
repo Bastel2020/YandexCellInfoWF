@@ -18,13 +18,15 @@ namespace YandexCellInfoWF.Models
                         .SelectMany(e => e.Sectors.Select(s => s.Number))
                         .GroupBy(num => num)
                         .OrderBy(num => num.Key)
-                        .Select(k => $"{k.Key}: {k.Count()}");
+                        .Select(k => $"{k.Key}: {k.Count()}")
+                        .ToArray();
                 }
                 catch { return null; }
             }
         }
 
-        public DetailedInfoResults(string MCC, string MNC, string enbRange, string LACsRange, IEnumerable<EnbFullInfo> enbs) : base(MCC, MNC, enbRange, LACsRange, enbs)
+        public DetailedInfoResults(string MCC, string MNC, string enbRange, string LACsRange, string sectorsRange, IEnumerable<EnbFullInfo> enbs) :
+            base(MCC, MNC, enbRange, LACsRange, sectorsRange, enbs)
         {
 
         }

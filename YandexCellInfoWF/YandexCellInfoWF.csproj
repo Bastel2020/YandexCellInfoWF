@@ -104,6 +104,7 @@
     <Compile Include="Helpers\Math.cs" />
     <Compile Include="Models\CellInfo.cs" />
     <Compile Include="Models\BaseItemInfo.cs" />
+    <Compile Include="Models\EqualResults.cs" />
     <Compile Include="Models\ResultsModel.cs" />
     <Compile Include="Models\DetailedInfoResults.cs" />
     <Compile Include="Models\EnbFullInfoJson.cs" />
@@ -123,8 +124,10 @@
     <Compile Include="Services\GzipService.cs" />
     <Compile Include="Services\KmlService.cs" />
     <Compile Include="Services\RequestService.cs" />
+    <Compile Include="Services\SearcherService.cs" />
     <Compile Include="Services\SettingsLoaderService.cs" />
     <Compile Include="Workers\DetailedInfoWorker.cs" />
+    <Compile Include="Workers\ManyInfoWorker.Old.cs" />
     <Compile Include="Workers\ManyInfoWorker.cs" />
     <Compile Include="Workers\InputParser.cs" />
     <EmbeddedResource Include="Form1.resx">

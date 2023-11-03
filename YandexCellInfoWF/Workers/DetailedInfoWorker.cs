@@ -42,7 +42,7 @@ namespace YandexCellInfoWF.Workers
                 console.AppendText($"\r\n[{DateTime.Now:T}] Подробный поиск БС завершен, найдено БС: {result.Count}. Секторов: {result.SelectMany(r => r.Sectors).Count()}");
                 return true;
             }
-            var preparedResults = new DetailedInfoResults(mccString, mncString, enbsString, lacsString, result);
+            var preparedResults = new DetailedInfoResults(mccString, mncString, enbsString, lacsString, "0-255", result);
 
             var dir = Environment.CurrentDirectory + $"\\{mccString}-{mncString}";
             Directory.CreateDirectory(dir);
