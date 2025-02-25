@@ -56,6 +56,7 @@ namespace YandexCellInfoWF.Workers
             hashsetSectors = null;
 
             var enbToRequest = parsedData.Enbs
+                .Distinct()
                 .Where(enb => !existingEnbs.ContainsKey(enb))
                 .OrderBy(enb => enb)
                 .ToArray();
@@ -96,8 +97,35 @@ namespace YandexCellInfoWF.Workers
                 while (i > successInfo.Length && multiplier >= 2 && !multiplierBan)
                 {
                     multiplier = Math.Min(multiplier, enbToRequest.Length - i - 1);
+                    var enbsToMultiRequest = enbToRequest.Skip(i).Take(multiplier).ToArray();
+
+                    if (enbsToMultiRequest.Length == 0)
+                        break;
+
+                    var localFoundMulti = enbsToMultiRequest.Length < 2 ? new BaseItemInfo[0] :
+                        existingEnbs.Where(enb =>
+                    {
+                        return enb.Key > enbsToMultiRequest[1] && enb.Key < enbsToMultiRequest[enbsToMultiRequest.Length - 1];
+                    })
+                        .Select(enb => enb.Value)
+                        .ToArray();
+
+                    if (localFoundMulti.Length > 0)
+                    {
+                        results.AddRange(localFoundMulti);
+                        successCounter += localFoundMulti.Length;
+                        totalFound.Text = successCounter.ToString();
+                        multiplierBan = false;
+                        foreach (var item in localFoundMulti)
+                        {
+                            console.AppendText($"\r\n[{DateTime.Now:T}] Найдено!* Enb: {item.Number}." +
+                                $"\r\nGPS: {item.Latitude:0.00000}, {item.Longitude:0.00000}");
+                            console.ScrollToCaret();
+                        }
+                    }
+
                     BaseItemInfo multiResponse = await MakeMultiEnbRequest(console, requestsTodayCount, parsedData, commonInfo,
-                        enbToRequest.Skip(i).Take(multiplier).ToArray());
+                        enbsToMultiRequest);
                     //Операция отменена
                     if (multiResponse == null)
                         break;

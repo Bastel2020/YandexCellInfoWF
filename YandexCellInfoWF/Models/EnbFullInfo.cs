@@ -66,5 +66,10 @@ namespace YandexCellInfoWF.Models
             var str = $"{Longitude};{Latitude};{Precision};{Enb};{sectorsHash.GetHashCode()}";
             return str.GetHashCode();
         }
+
+        public override string ToString()
+        {
+            return $"#{Enb} Sectors: {string.Join(", ", Sectors?.Select(s => s.Number.ToString()))}";
+        }
     }
 }

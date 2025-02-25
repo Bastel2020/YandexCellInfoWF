@@ -134,8 +134,8 @@ namespace YandexCellInfoWF.Services
                 .ToHashSet();
             if (parsedFileInput == null || parsedFileInput.Count == 0)
                 return false;
-            return enteredInput
-                .All(enteredLAC => parsedFileInput.Contains(enteredLAC));
+            return parsedFileInput
+                .All(enteredLAC => enteredInput.Contains(enteredLAC));
         }
 
         private static bool CheckDate(string filePath)
